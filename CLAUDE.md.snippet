@@ -1,0 +1,71 @@
+# Session Management
+
+This project uses an automated session continuity system with hooks and commands.
+
+## How It Works
+
+1. **Automatic backup** - Hooks save raw transcripts when sessions end or compact
+2. **Opt-in restore** - Run `/resume-latest` to process backups and restore context
+3. **Manual save** - Run `/document-and-save` to create a high-quality session summary
+
+## Key Files
+
+| File | Purpose | Auto-Loaded |
+|------|---------|-------------|
+| `planning/sessions/active-context.md` | Current session state | Yes |
+| `planning/sessions/project-memory.md` | Permanent project knowledge | Yes |
+| `planning/sessions/raw/*.jsonl` | Raw transcript backups | No |
+| `planning/sessions/.pending-backup` | Marker for unprocessed backup | No |
+
+## Hooks (Automatic)
+
+| Hook | Trigger | Action |
+|------|---------|--------|
+| `on-session-end.sh` | `/exit`, `/clear`, logout | Saves transcript + creates marker |
+| `on-pre-compact.sh` | Context ~90% full | Saves transcript + creates marker |
+| `on-session-start.sh` | Session starts | Outputs `SESSION_BACKUP_PENDING` if marker exists |
+
+## Commands (Manual)
+
+| Command | Purpose |
+|---------|---------|
+| `/document-and-save` | Save session summary to default path |
+| `/document-and-save-to <path>` | Save session summary to specific path |
+| `/resume-latest` | Process pending backup or load most recent session |
+| `/resume-from <path>` | Load specific session document |
+| `/sessions-list` | Browse available session logs |
+| `/discard-backup` | Discard pending backup without processing |
+
+## Rules for Session Management
+
+1. **On `/document-and-save`**:
+   - **FIRST** update `active-context.md` with condensed summary
+   - **THEN** write the full session document
+   - This order prevents data loss from auto-compaction race conditions
+
+2. **On processing pending backup** (via `/resume-latest`):
+   - Read the raw JSONL backup file
+   - Parse conversation history and generate summary
+   - Update `active-context.md`
+   - Delete the `.pending-backup` marker
+
+3. **Context recovery is opt-in**:
+   - SessionStart hook outputs to stdout (visible to Claude, not user)
+   - User must run `/resume-latest` or `/sessions-list` to restore context
+
+4. **Proactive documentation**:
+   - Document at natural milestones (phase completion, major feature done)
+   - Don't wait for context limits
+
+5. **Project memory updates**:
+   - Add important patterns, gotchas, or decisions to `project-memory.md`
+
+---
+
+## Session Context
+
+@planning/sessions/active-context.md
+
+## Project Knowledge
+
+@planning/sessions/project-memory.md
