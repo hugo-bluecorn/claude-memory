@@ -6,6 +6,12 @@ description: Resume from the most recent session log automatically
 
 Please follow these steps. Wrap all output at 120 characters maximum.
 
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--yes` | Skip confirmation prompts and proceed automatically |
+
 ## 0. Check for Pending Raw Transcript
 
 **FIRST**, check for pending backups. There may be multiple backup markers:
@@ -71,7 +77,9 @@ Display the session to be loaded:
 - **Project**: From YAML frontmatter (if available)
 - **Status**: From YAML frontmatter (if available)
 
-Ask: "Load this session? (If not, use `/sessions-list` to see all available sessions)"
+**If `--yes` flag is present**: Skip confirmation and proceed directly to Step 3.
+
+**Otherwise**: Ask "Load this session? (If not, use `/sessions-list` to see all available sessions)"
 
 ## 3. Process Based on Source Type
 
