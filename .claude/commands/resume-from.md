@@ -1,22 +1,35 @@
 ---
-description: Resume work from a previous session document. Usage: /resume-from <filepath>
+description: Resume work from a previous session document. Usage: /resume-from <filepath> [--yes]
 ---
 
 # Resume From Session Document
 
 Please follow these steps. Wrap all output at 120 characters maximum.
 
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `<filepath>` | Path to the session document to load |
+| `--yes` | Skip confirmation prompts and proceed automatically |
+
 ## 0. Check for Pending Backup
 
-**FIRST**, check for pending backup:
+**FIRST**, check for pending backups (there may be multiple):
 
-1. If your SessionStart context includes `SESSION_BACKUP_PENDING`, extract the backup path from that message.
-2. Otherwise, check the marker file:
+1. If your SessionStart context includes `SESSION_BACKUP_PENDING`, extract the backup path(s) from that message.
+2. Otherwise, check the marker files:
    ```bash
+   cat planning/sessions/.pending-backup-exit 2>/dev/null
+   cat planning/sessions/.pending-backup-compact 2>/dev/null
    cat planning/sessions/.pending-backup 2>/dev/null
    ```
 
-If a pending backup exists, ask the user:
+If a pending backup exists:
+
+**If `--yes` flag is present**: Skip to Step 1 (load requested session, don't process pending backup).
+
+**Otherwise**: Ask the user:
 
 > A pending backup exists at `[path]`. Choose:
 > 1. Process pending backup first (runs /resume-latest flow)
@@ -97,7 +110,11 @@ If a "Remaining Todos" section exists:
 
 ## 7. Present Next Steps
 
-Show the documented "Next Steps" from the session, then ask:
+Show the documented "Next Steps" from the session.
+
+**If `--yes` flag is present**: Automatically choose option 1 (continue with documented next steps).
+
+**Otherwise**: Ask:
 
 > **How would you like to proceed?**
 > 1. Continue with the documented next steps (recommended)

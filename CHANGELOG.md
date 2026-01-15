@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `/cleanup-backups` command for managing old raw transcript backups
+- `/search-sessions` command for searching across session documents
+- `--yes` flag for `/resume-latest` and `/resume-from` to skip confirmations
 - Staleness detection for active-context.md (warns if >24h old, configurable via `HOOK_STALENESS_THRESHOLD`)
 - Context overhead warning (warns if combined context files >20KB, configurable via `HOOK_OVERHEAD_THRESHOLD`)
 - Timestamp header in active-context.md template (`> Last Updated:`)
