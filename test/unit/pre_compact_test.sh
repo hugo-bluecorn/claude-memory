@@ -282,3 +282,66 @@ function test_pre_compact_does_not_overwrite_exit_marker() {
   # Compact marker should also exist
   assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-compact"
 }
+
+# === Phase 1.2: PreCompact Hardening Tests ===
+# These tests enforce parity with SessionEnd's robustness
+
+function test_pre_compact_skips_empty_transcript_file() {
+  # Empty transcript file should be skipped (not backed up)
+  # This achieves parity with SessionEnd's behavior
+  local transcript_file="$TEST_DIR/empty_transcript.jsonl"
+  touch "$transcript_file"  # Empty file
+
+  local json="{\"transcript_path\":\"$transcript_file\",\"trigger\":\"auto\",\"session_id\":\"test-123\"}"
+  local exit_code=0
+
+  echo "$json" | bash "$HOOK_PATH" 2>&1 || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+
+  # No backup should be created for empty file
+  local backup_count
+  backup_count=$(find "$HOOK_SESSIONS_DIR/raw" -name "*.jsonl" -type f 2>/dev/null | wc -l)
+  assert_equals "0" "$backup_count"
+
+  # No marker should be created
+  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup-compact"
+}
+
+function test_pre_compact_logs_debug_when_enabled() {
+  # When HOOK_DEBUG=true, should write to debug log
+  local transcript_file="$TEST_DIR/transcript.jsonl"
+  create_test_transcript "$transcript_file"
+
+  export HOOK_DEBUG=true
+  local json="{\"transcript_path\":\"$transcript_file\",\"trigger\":\"auto\",\"session_id\":\"test-123\"}"
+  echo "$json" | bash "$HOOK_PATH" 2>&1
+  unset HOOK_DEBUG
+
+  # Debug log should exist with content
+  assert_file_exists "$HOOK_SESSIONS_DIR/.debug-log"
+  local log_content
+  log_content=$(cat "$HOOK_SESSIONS_DIR/.debug-log")
+  assert_contains "PreCompact" "$log_content"
+}
+
+function test_pre_compact_updates_active_context() {
+  # PreCompact should update active-context.md with compaction info
+  local transcript_file="$TEST_DIR/transcript.jsonl"
+  create_test_transcript "$transcript_file"
+
+  # Create initial active-context.md
+  echo "# Active Session Context" > "$HOOK_SESSIONS_DIR/active-context.md"
+  echo "" >> "$HOOK_SESSIONS_DIR/active-context.md"
+  echo "## Current Task" >> "$HOOK_SESSIONS_DIR/active-context.md"
+  echo "Test task" >> "$HOOK_SESSIONS_DIR/active-context.md"
+
+  local json="{\"transcript_path\":\"$transcript_file\",\"trigger\":\"auto\",\"session_id\":\"test-123\"}"
+  echo "$json" | bash "$HOOK_PATH" 2>&1
+
+  # Active context should contain compaction info
+  local context_content
+  context_content=$(cat "$HOOK_SESSIONS_DIR/active-context.md")
+  assert_contains "Compaction" "$context_content"
+  assert_contains "auto" "$context_content"
+}
