@@ -8,24 +8,37 @@ Please follow these steps. Wrap all output at 120 characters maximum.
 
 ## 0. Check for Pending Raw Transcript
 
-**FIRST**, check for pending backup using one of these methods:
+**FIRST**, check for pending backups. There may be multiple backup markers:
 
-1. If your SessionStart context includes `SESSION_BACKUP_PENDING`, extract the backup path directly from that message.
-2. Otherwise, check the marker file:
+| Marker File | Created By | When |
+|-------------|------------|------|
+| `.pending-backup-compact` | PreCompact hook | Context auto-compaction |
+| `.pending-backup-exit` | SessionEnd hook | Session exit (/exit, logout) |
+| `.pending-backup` | Legacy | Backward compatibility |
+
+**Detection methods:**
+
+1. If your SessionStart context includes `SESSION_BACKUP_PENDING`, extract the backup path(s) and type(s) directly.
+2. Otherwise, check for markers:
    ```bash
+   # Check all marker types (newest is usually most relevant)
+   cat planning/sessions/.pending-backup-exit 2>/dev/null
+   cat planning/sessions/.pending-backup-compact 2>/dev/null
    cat planning/sessions/.pending-backup 2>/dev/null
    ```
 
-If a pending backup exists:
-- Read the raw transcript file indicated in the marker
-- Parse the JSONL conversation history
-- Generate a high-quality summary
+**If pending backup(s) exist:**
+- Read the raw transcript file(s) indicated in the marker(s)
+- Parse the JSONL conversation history (see JSONL Format Reference below)
+- Generate a high-quality summary following the Extraction Strategy
 - Update `planning/sessions/active-context.md` with the summary
 - Optionally create a session document: `planning/sessions/session-YYYY-MM-DD-HHMM.md`
-- Delete the `.pending-backup` marker
+- Delete the processed marker file(s)
 - Continue to step 3 (skip steps 1-2 since we just processed the latest)
 
-If no marker, continue to step 1.
+**Note:** If both `compact` and `exit` markers exist, the `exit` backup is typically more complete (includes post-compaction work). Process the exit backup and discard the compact backup.
+
+If no markers exist, continue to step 1.
 
 ## 1. Find the Most Recent Session
 
@@ -76,14 +89,67 @@ Follow all steps from the `/resume-from` command:
 ### If loading from Raw Transcript (.jsonl):
 
 1. Read and parse the JSONL file (each line is a JSON object)
-2. Extract conversation history (user messages, assistant responses, tool calls)
-3. Identify key accomplishments, decisions, and context from the conversation
+2. Extract conversation history using the JSONL Format Reference below
+3. Apply the Extraction Strategy to identify key information
 4. Generate a high-quality summary following the session document format
 5. Update `planning/sessions/active-context.md` with condensed summary
 6. Optionally save full summary to `planning/sessions/session-YYYY-MM-DD-HHMM.md`
 7. Present summary and next steps to user
 
 See `/resume-from` for detailed instructions on each step.
+
+---
+
+## JSONL Format Reference
+
+Each line in the raw transcript is a JSON object with one of these structures:
+
+**Summary line** (first line):
+```json
+{"type":"summary","summary":"Brief session description"}
+```
+
+**User message**:
+```json
+{"type":"user","message":{"role":"user","content":"User's message text"}}
+```
+
+**Assistant message**:
+```json
+{"type":"assistant","message":{"role":"assistant","content":"Claude's response"}}
+```
+
+**Tool call**:
+```json
+{"type":"tool_use","tool":"Bash","input":{"command":"..."}}
+```
+
+**Tool result**:
+```json
+{"type":"tool_result","output":"..."}
+```
+
+**Error handling**: Skip malformed lines (invalid JSON) and continue processing. Log skipped lines if debug mode is enabled.
+
+---
+
+## Extraction Strategy
+
+When parsing a raw transcript, follow this strategy to build a useful summary:
+
+1. **Identify main tasks/questions**: Collect all user messages and extract the primary requests
+2. **Extract decisions and explanations**: Review assistant messages for key decisions, reasoning, and explanations given
+3. **Track files modified**: Look for `tool_use` of type "Write" or "Edit" to identify changed files
+4. **Document failed approaches**: Search `tool_result` outputs for error patterns, exceptions, or failed attempts
+5. **Note environment details**: Extract any system info, configuration, or environment-specific details mentioned
+
+**Summary structure**: Organize extracted information into these sections:
+- **Session Goal**: What the user wanted to accomplish
+- **Key Accomplishments**: What was completed successfully
+- **Files Changed**: List of files created, modified, or deleted
+- **Decisions Made**: Important choices and their rationale
+- **Failed Approaches**: What didn't work and why (helps avoid repeating mistakes)
+- **Next Steps**: What was planned but not completed
 
 ---
 
