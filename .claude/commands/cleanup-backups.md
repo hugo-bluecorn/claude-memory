@@ -1,10 +1,10 @@
 ---
-description: Clean up old backup files in planning/sessions/raw/
+description: Clean up old backup files in .claude/memory/raw/
 ---
 
 # Cleanup Backups
 
-Remove old raw transcript backups from `planning/sessions/raw/` to free up disk space.
+Remove old raw transcript backups from `.claude/memory/raw/` to free up disk space.
 
 ## Usage
 
@@ -24,10 +24,10 @@ Remove old raw transcript backups from `planning/sessions/raw/` to free up disk 
 
 ### 1. List All Backup Files
 
-Find all `.jsonl` files in `planning/sessions/raw/`:
+Find all `.jsonl` files in `.claude/memory/raw/`:
 
 ```bash
-ls -la planning/sessions/raw/*.jsonl 2>/dev/null
+ls -la .claude/memory/raw/*.jsonl 2>/dev/null
 ```
 
 If no backups exist, inform the user and exit.
@@ -70,7 +70,7 @@ Proceed with deletion? [y/N]
 If user confirms (or `--dry-run` not specified and user confirms):
 
 ```bash
-rm planning/sessions/raw/<filename>.jsonl
+rm .claude/memory/raw/<filename>.jsonl
 ```
 
 Report results:
@@ -86,10 +86,10 @@ After deletion, check if any pending backup markers point to deleted files:
 ```bash
 # Check each marker
 for marker in .pending-backup-compact .pending-backup-exit .pending-backup; do
-  if [[ -f "planning/sessions/$marker" ]]; then
-    backup_path=$(cat "planning/sessions/$marker")
+  if [[ -f ".claude/memory/$marker" ]]; then
+    backup_path=$(cat ".claude/memory/$marker")
     if [[ ! -f "$backup_path" ]]; then
-      rm "planning/sessions/$marker"
+      rm ".claude/memory/$marker"
       echo "Cleaned up stale marker: $marker"
     fi
   fi

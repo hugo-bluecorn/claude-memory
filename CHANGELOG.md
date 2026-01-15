@@ -39,6 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `bash "$CLAUDE_PROJECT_DIR/..."` ensures bash handles variable expansion
 
 ### Changed
+- **BREAKING**: Session storage moved from `planning/sessions/` to `.claude/memory/`
+  - Context files: `.claude/memory/active-context.md`, `.claude/memory/project-memory.md`
+  - Session documents: `.claude/memory/sessions/session-*.md`
+  - Raw backups: `.claude/memory/raw/*.jsonl`
+  - Keeps all Claude-related files together, avoids future naming conflicts
 - `/document-and-save` now records session document path for coalescing support
 - PreCompact hook refactored with structured input parsing
 - `/resume-latest` now documents all three marker types and offers coalesce option

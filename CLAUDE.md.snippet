@@ -12,10 +12,10 @@ This project uses an automated session continuity system with hooks and commands
 
 | File | Purpose | Auto-Loaded |
 |------|---------|-------------|
-| `planning/sessions/active-context.md` | Current session state | Yes |
-| `planning/sessions/project-memory.md` | Permanent project knowledge | Yes |
-| `planning/sessions/raw/*.jsonl` | Raw transcript backups | No |
-| `planning/sessions/.pending-backup` | Marker for unprocessed backup | No |
+| `.claude/memory/active-context.md` | Current session state | Yes |
+| `.claude/memory/project-memory.md` | Permanent project knowledge | Yes |
+| `.claude/memory/raw/*.jsonl` | Raw transcript backups | No |
+| `.claude/memory/.pending-backup` | Marker for unprocessed backup | No |
 
 ## Hooks (Automatic)
 
@@ -64,8 +64,8 @@ This project uses an automated session continuity system with hooks and commands
 
 ## Session Context
 
-@planning/sessions/active-context.md
+@.claude/memory/active-context.md
 
 ## Project Knowledge
 
-@planning/sessions/project-memory.md
+@.claude/memory/project-memory.md

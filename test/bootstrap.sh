@@ -24,8 +24,9 @@ function create_test_environment() {
   local test_dir
   test_dir=$(mktemp -d)
 
-  mkdir -p "$test_dir/planning/sessions/raw"
-  touch "$test_dir/planning/sessions/active-context.md"
+  mkdir -p "$test_dir/.claude/memory/raw"
+  mkdir -p "$test_dir/.claude/memory/sessions"
+  touch "$test_dir/.claude/memory/active-context.md"
 
   echo "$test_dir"
 }
@@ -66,7 +67,7 @@ EOF
 function assert_backup_created() {
   local test_dir="$1"
   local pattern="${2:-*.jsonl}"
-  local raw_dir="$test_dir/planning/sessions/raw"
+  local raw_dir="$test_dir/.claude/memory/raw"
 
   if [[ ! -d "$raw_dir" ]]; then
     fail "Raw directory does not exist: $raw_dir"
@@ -89,7 +90,7 @@ function assert_backup_created() {
 function assert_pending_marker_exists() {
   local test_dir="$1"
   local expected_path="${2:-}"
-  local marker="$test_dir/planning/sessions/.pending-backup"
+  local marker="$test_dir/.claude/memory/.pending-backup"
 
   assert_file_exists "$marker"
 
@@ -104,7 +105,7 @@ function assert_pending_marker_exists() {
 # Usage: assert_active_context_updated "$test_dir"
 function assert_active_context_updated() {
   local test_dir="$1"
-  local context_file="$test_dir/planning/sessions/active-context.md"
+  local context_file="$test_dir/.claude/memory/active-context.md"
 
   assert_file_exists "$context_file"
 
@@ -137,7 +138,7 @@ function run_hook_with_env() {
 
   # Set environment variables for hook testability
   export HOOK_PROJECT_DIR="$test_dir"
-  export HOOK_SESSIONS_DIR="$test_dir/planning/sessions"
+  export HOOK_SESSIONS_DIR="$test_dir/.claude/memory"
 
   HOOK_OUTPUT=$(echo "$json_input" | bash "$hook_path" 2>&1) || HOOK_EXIT_CODE=$?
 

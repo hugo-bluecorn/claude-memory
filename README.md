@@ -67,9 +67,9 @@ curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/set
    chmod +x .claude/scripts/*.sh
 
    # Create sessions directory
-   mkdir -p planning/sessions/raw
-   cp src/templates/active-context.md planning/sessions/
-   cp src/templates/project-memory.md planning/sessions/
+   mkdir -p .claude/memory/raw
+   cp src/templates/active-context.md .claude/memory/
+   cp src/templates/project-memory.md .claude/memory/
    ```
 
 2. Merge hooks into your `.claude/settings.json`:
@@ -120,7 +120,7 @@ curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/set
 
 | Command | Description |
 |---------|-------------|
-| `/document-and-save` | Save current session to `planning/sessions/session-YYYY-MM-DD-HHMM.md` |
+| `/document-and-save` | Save current session to `.claude/memory/session-YYYY-MM-DD-HHMM.md` |
 | `/document-and-save-to <path>` | Save session to a custom path |
 | `/resume-latest` | Process pending backup or load most recent session |
 | `/resume-from <path>` | Load a specific session document |
@@ -137,7 +137,7 @@ Use `--yes` flag with `/resume-latest` or `/resume-from` to skip confirmation pr
 
 ### Automatic Backup (Safety Net)
 
-1. **Session End** - When you run `/exit` or close the terminal, `on-session-end.sh` saves the raw transcript to `planning/sessions/raw/`
+1. **Session End** - When you run `/exit` or close the terminal, `on-session-end.sh` saves the raw transcript to `.claude/memory/raw/`
 2. **Auto-Compact** - When context reaches ~90%, `on-pre-compact.sh` saves the transcript before compaction
 3. **Next Session** - `on-session-start.sh` detects the pending backup and notifies Claude
 
@@ -177,7 +177,7 @@ your-project/
 │   └── scripts/
 │       └── discard-backup.sh
 │
-└── planning/sessions/
+└── .claude/memory/
     ├── active-context.md        # Current session state (auto-loaded)
     ├── project-memory.md        # Permanent knowledge (auto-loaded)
     ├── session-*.md             # Archived session documents

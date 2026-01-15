@@ -4,7 +4,7 @@ description: Document session to specified file path. Usage: /document-and-save-
 
 # Document and Save to Custom Path
 
-Document session to: **$ARGUMENTS** (or default: `planning/sessions/session-YYYY-MM-DD-HHMM.md`)
+Document session to: **$ARGUMENTS** (or default: `.claude/memory/session-YYYY-MM-DD-HHMM.md`)
 
 Please follow these steps. Wrap all output at 120 characters maximum.
 
@@ -17,7 +17,7 @@ Check for pending backup:
 1. If your SessionStart context includes `SESSION_BACKUP_PENDING`, note the backup path.
 2. Otherwise, check the marker file:
    ```bash
-   cat planning/sessions/.pending-backup 2>/dev/null
+   cat .claude/memory/.pending-backup 2>/dev/null
    ```
 
 If a pending backup exists, inform the user:
@@ -27,7 +27,7 @@ If a pending backup exists, inform the user:
 
 Continue with documentation (don't block).
 
-## Step 1: UPDATE `planning/sessions/active-context.md` FIRST
+## Step 1: UPDATE `.claude/memory/active-context.md` FIRST
 
 This is the most critical step - do this BEFORE writing the full session document.
 Write condensed context immediately:

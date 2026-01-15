@@ -20,10 +20,10 @@ Before proceeding, verify coalescing is possible:
 
 ### Step 1: Check for Last Session Doc
 
-Read `planning/sessions/active-context.md` and look for the `> Last Session Doc:` field.
+Read `.claude/memory/active-context.md` and look for the `> Last Session Doc:` field.
 
 ```bash
-grep "^> Last Session Doc:" planning/sessions/active-context.md
+grep "^> Last Session Doc:" .claude/memory/active-context.md
 ```
 
 If this field is empty or missing, coalescing is **not possible** - there's no target session document.
@@ -34,7 +34,7 @@ Inform the user and suggest running `/document-and-save` instead.
 Check for the compact backup marker:
 
 ```bash
-cat planning/sessions/.pending-backup-compact 2>/dev/null
+cat .claude/memory/.pending-backup-compact 2>/dev/null
 ```
 
 If this file doesn't exist, coalescing is **not possible** - there's no delta to merge.
@@ -44,7 +44,7 @@ Inform the user: "No pending compact backup found. Nothing to coalesce."
 
 1. Verify the session document exists:
    ```bash
-   ls planning/sessions/[session-doc-name] 2>/dev/null
+   ls .claude/memory/[session-doc-name] 2>/dev/null
    ```
 
 2. Verify the backup file exists (path from marker file):
@@ -61,7 +61,7 @@ If either is missing, inform the user and suggest appropriate action:
 Extract the session document date from its YAML frontmatter:
 
 ```bash
-grep "^date:" planning/sessions/[session-doc-name] | head -1
+grep "^date:" .claude/memory/[session-doc-name] | head -1
 ```
 
 Extract the backup timestamp from its filename (format: `YYYYMMDD_HHMMSS_compact.jsonl`).
@@ -134,7 +134,7 @@ Update the YAML frontmatter:
 
 ### Step 6: Update active-context.md
 
-Update `planning/sessions/active-context.md`:
+Update `.claude/memory/active-context.md`:
 1. Update `> Last Updated:` to current timestamp
 2. Keep `> Last Session Doc:` pointing to same file (now updated)
 3. Update other sections to reflect the coalesced work
@@ -145,7 +145,7 @@ Update `planning/sessions/active-context.md`:
 Delete the pending backup marker:
 
 ```bash
-rm planning/sessions/.pending-backup-compact
+rm .claude/memory/.pending-backup-compact
 ```
 
 Optionally delete the backup file (or keep for reference):
@@ -159,7 +159,7 @@ After successful coalescing, inform the user:
 ```
 Successfully coalesced delta work into session document.
 
-Session document: planning/sessions/[session-doc-name]
+Session document: .claude/memory/[session-doc-name]
 - Added "Session Continuation" section with [N] additional items
 - Updated frontmatter date to [timestamp]
 

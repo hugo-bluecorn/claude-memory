@@ -36,7 +36,7 @@ Claude Memory solves a fundamental problem: Claude Code sessions are ephemeral. 
 │         │                   │                   │                            │
 │         ▼                   ▼                   ▼                            │
 │  ┌──────────────────────────────────────────────────────┐                   │
-│  │              planning/sessions/                       │                   │
+│  │              .claude/memory/                       │                   │
 │  │  ┌─────────────────────┐  ┌─────────────────────┐    │                   │
 │  │  │  active-context.md  │  │  project-memory.md  │    │   AUTO-LOADED    │
 │  │  │  (current state)    │  │  (persistent info)  │    │   CONTEXT        │

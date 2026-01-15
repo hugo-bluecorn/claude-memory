@@ -15,9 +15,9 @@ Check for pending backups (there may be multiple):
 1. If your SessionStart context includes `SESSION_BACKUP_PENDING`, note the backup path(s).
 2. Otherwise, check the marker files:
    ```bash
-   cat planning/sessions/.pending-backup-exit 2>/dev/null
-   cat planning/sessions/.pending-backup-compact 2>/dev/null
-   cat planning/sessions/.pending-backup 2>/dev/null
+   cat .claude/memory/.pending-backup-exit 2>/dev/null
+   cat .claude/memory/.pending-backup-compact 2>/dev/null
+   cat .claude/memory/.pending-backup 2>/dev/null
    ```
 
 If a pending backup exists, inform the user:
@@ -27,7 +27,7 @@ If a pending backup exists, inform the user:
 
 Continue with documentation (don't block).
 
-## Step 1: UPDATE `planning/sessions/active-context.md` FIRST
+## Step 1: UPDATE `.claude/memory/active-context.md` FIRST
 
 This is the most critical step - do this BEFORE writing the full session document.
 Write condensed context immediately:
@@ -64,14 +64,14 @@ This enables session coalescing - merging delta work done after this save but be
 
 ## Step 2: Create Full Session Document
 
-Create a comprehensive session document in `planning/sessions/session-YYYY-MM-DD-HHMM.md` with:
+Create a comprehensive session document in `.claude/memory/session-YYYY-MM-DD-HHMM.md` with:
 
 ### Auto-detect Previous Session
 
 Before creating the document, find the most recent existing session:
 
 ```bash
-ls -t planning/sessions/session-*.md 2>/dev/null | head -1
+ls -t .claude/memory/session-*.md 2>/dev/null | head -1
 ```
 
 If a previous session exists, set `previous_session` to its relative path (e.g., `session-2026-01-14-1430.md`).
@@ -159,7 +159,7 @@ This creates a chain of sessions that can be followed for full project history.
 
 ## Step 3: Final Steps
 
-1. **Create the session log directory** if it doesn't exist (`planning/sessions/`)
+1. **Create the session log directory** if it doesn't exist (`.claude/memory/`)
 2. **Confirm the file was created** by showing the full file path
 3. **Update `active-context.md` with session doc path** for coalescing support:
    - Edit the `> Last Session Doc:` line to contain the actual session document filename
@@ -167,7 +167,7 @@ This creates a chain of sessions that can be followed for full project history.
    - This enables `/coalesce` to merge delta work if compaction occurs before the next save
 4. **Provide instructions** for resuming:
    - "Next session will auto-load context via CLAUDE.md @imports"
-   - For full details: `/resume-from planning/sessions/session-YYYY-MM-DD-HHMM.md`
+   - For full details: `/resume-from .claude/memory/session-YYYY-MM-DD-HHMM.md`
    - Alternative: `/resume-latest` to automatically load the most recent session
    - If compaction occurs before next `/document-and-save`, run `/coalesce` to merge delta work
 
