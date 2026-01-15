@@ -5,6 +5,11 @@
 # Exit codes:
 #   0 = success (always - SessionStart cannot block, exit 2 only shows stderr to user)
 # Note: stdout is added as context for Claude, enabling awareness of pending backups
+#
+# Supports multiple marker types:
+#   .pending-backup-compact - Created by PreCompact hook
+#   .pending-backup-exit - Created by SessionEnd hook
+#   .pending-backup - Legacy marker (for backward compatibility)
 
 set -euo pipefail
 
@@ -24,29 +29,52 @@ else
   SESSIONS_DIR="$PROJECT_DIR/planning/sessions"
 fi
 
-MARKER="$SESSIONS_DIR/.pending-backup"
+# Check if sessions directory exists
+if [[ ! -d "$SESSIONS_DIR" ]]; then
+  exit 0
+fi
 
-if [[ -f "$MARKER" ]]; then
-  # Read marker content, trim leading/trailing whitespace only
-  BACKUP_PATH=$(cat "$MARKER" 2>/dev/null || echo "")
-  BACKUP_PATH="${BACKUP_PATH#"${BACKUP_PATH%%[![:space:]]*}"}"  # trim leading
-  BACKUP_PATH="${BACKUP_PATH%"${BACKUP_PATH##*[![:space:]]}"}"  # trim trailing
+# Track if we found any valid pending backups
+found_pending=false
 
-  if [[ -z "$BACKUP_PATH" ]]; then
-    # Empty marker, clean up
-    rm -f "$MARKER"
-    exit 0
-  elif [[ ! -f "$BACKUP_PATH" ]]; then
-    # Backup file doesn't exist, clean up marker
-    rm -f "$MARKER"
-    exit 0
+# Process a single marker file
+process_marker() {
+  local marker_file="$1"
+  local marker_type="$2"
+
+  if [[ ! -f "$marker_file" ]]; then
+    return 0
   fi
 
-  # Valid pending backup exists - output notification to stdout for Claude context
-  # SessionStart cannot block (exit 2 only shows stderr to user, doesn't require acknowledgment)
-  echo "SESSION_BACKUP_PENDING: A previous session backup exists at $BACKUP_PATH"
+  # Read marker content, trim whitespace
+  local backup_path
+  backup_path=$(cat "$marker_file" 2>/dev/null || echo "")
+  backup_path="${backup_path#"${backup_path%%[![:space:]]*}"}"  # trim leading
+  backup_path="${backup_path%"${backup_path##*[![:space:]]}"}"  # trim trailing
+
+  if [[ -z "$backup_path" ]]; then
+    # Empty marker, clean up
+    rm -f "$marker_file"
+    return 0
+  elif [[ ! -f "$backup_path" ]]; then
+    # Backup file doesn't exist, clean up marker
+    rm -f "$marker_file"
+    return 0
+  fi
+
+  # Valid pending backup exists - output notification
+  echo "SESSION_BACKUP_PENDING ($marker_type): Backup exists at $backup_path"
+  found_pending=true
+}
+
+# Check for all marker types
+process_marker "$SESSIONS_DIR/.pending-backup-compact" "compact"
+process_marker "$SESSIONS_DIR/.pending-backup-exit" "exit"
+process_marker "$SESSIONS_DIR/.pending-backup" "legacy"
+
+# If any pending backups were found, output instructions
+if [[ "$found_pending" == "true" ]]; then
   echo "User should run /resume-latest to restore context, or /discard-backup to discard."
-  exit 0
 fi
 
 exit 0

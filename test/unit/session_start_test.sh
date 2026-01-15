@@ -2,8 +2,11 @@
 # SessionStart hook tests
 # Tests for src/hooks/on-session-start.sh
 
-# Path to the hook under test (relative to test/unit)
-HOOK_PATH="../../src/hooks/on-session-start.sh"
+# Get the directory where this test file is located
+TEST_FILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Path to the hook under test (absolute path based on test file location)
+HOOK_PATH="$TEST_FILE_DIR/../../src/hooks/on-session-start.sh"
 
 function set_up() {
   # Create isolated test environment for each test
@@ -210,4 +213,90 @@ function test_session_start_handles_missing_sessions_directory() {
   echo "$json" | bash "$HOOK_PATH" 2>&1 || exit_code=$?
 
   assert_equals "0" "$exit_code"
+}
+
+# === Phase 1.1: Multi-Marker Support Tests ===
+# These tests enforce the new marker naming convention
+
+function test_session_start_detects_compact_marker() {
+  # SessionStart should detect .pending-backup-compact
+  local backup_file="$HOOK_SESSIONS_DIR/raw/compact_backup.jsonl"
+  mkdir -p "$(dirname "$backup_file")"
+  create_test_transcript "$backup_file"
+
+  # Create compact marker
+  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup-compact"
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  assert_contains "SESSION_BACKUP_PENDING" "$stdout_output"
+  assert_contains "compact" "$stdout_output"
+}
+
+function test_session_start_detects_exit_marker() {
+  # SessionStart should detect .pending-backup-exit
+  local backup_file="$HOOK_SESSIONS_DIR/raw/exit_backup.jsonl"
+  mkdir -p "$(dirname "$backup_file")"
+  create_test_transcript "$backup_file"
+
+  # Create exit marker
+  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  assert_contains "SESSION_BACKUP_PENDING" "$stdout_output"
+  assert_contains "exit" "$stdout_output"
+}
+
+function test_session_start_detects_multiple_markers() {
+  # SessionStart should detect BOTH markers when both exist
+  local compact_backup="$HOOK_SESSIONS_DIR/raw/compact_backup.jsonl"
+  local exit_backup="$HOOK_SESSIONS_DIR/raw/exit_backup.jsonl"
+  mkdir -p "$(dirname "$compact_backup")"
+  create_test_transcript "$compact_backup"
+  create_test_transcript "$exit_backup"
+
+  # Create both markers
+  echo "$compact_backup" > "$HOOK_SESSIONS_DIR/.pending-backup-compact"
+  echo "$exit_backup" > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should mention both backups
+  assert_contains "compact" "$stdout_output"
+  assert_contains "exit" "$stdout_output"
+}
+
+function test_session_start_preserves_multiple_markers() {
+  # Both markers should be preserved after detection
+  local compact_backup="$HOOK_SESSIONS_DIR/raw/compact_backup.jsonl"
+  local exit_backup="$HOOK_SESSIONS_DIR/raw/exit_backup.jsonl"
+  mkdir -p "$(dirname "$compact_backup")"
+  create_test_transcript "$compact_backup"
+  create_test_transcript "$exit_backup"
+
+  echo "$compact_backup" > "$HOOK_SESSIONS_DIR/.pending-backup-compact"
+  echo "$exit_backup" > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  echo "$json" | bash "$HOOK_PATH" 2>&1
+
+  # Both markers should still exist
+  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-compact"
+  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 }
