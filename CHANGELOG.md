@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `/context-stats` command for viewing session management statistics
+- Session chaining: auto-detect and link to previous session in `/document-and-save`
+- Best practices documentation (`docs/best-practices.md`)
 - `/cleanup-backups` command for managing old raw transcript backups
 - `/search-sessions` command for searching across session documents
 - `--yes` flag for `/resume-latest` and `/resume-from` to skip confirmations
