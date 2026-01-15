@@ -1,4 +1,5 @@
 # Active Session Context
+> Last Updated: [YYYY-MM-DD HH:MM:SS]
 
 ## Current Task
 [What you're currently working on or should work on next]

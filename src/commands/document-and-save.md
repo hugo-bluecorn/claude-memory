@@ -10,11 +10,13 @@ Please follow these steps. Wrap all output at 120 characters maximum.
 
 ## Step 0: Check for Pending Backup
 
-Check for pending backup:
+Check for pending backups (there may be multiple):
 
-1. If your SessionStart context includes `SESSION_BACKUP_PENDING`, note the backup path.
-2. Otherwise, check the marker file:
+1. If your SessionStart context includes `SESSION_BACKUP_PENDING`, note the backup path(s).
+2. Otherwise, check the marker files:
    ```bash
+   cat planning/sessions/.pending-backup-exit 2>/dev/null
+   cat planning/sessions/.pending-backup-compact 2>/dev/null
    cat planning/sessions/.pending-backup 2>/dev/null
    ```
 
@@ -30,8 +32,12 @@ Continue with documentation (don't block).
 This is the most critical step - do this BEFORE writing the full session document.
 Write condensed context immediately:
 
+**IMPORTANT**: Always update the `> Last Updated:` timestamp to the current time (YYYY-MM-DD HH:MM:SS format).
+This enables staleness detection - SessionStart will warn if context is >24h old.
+
 ```markdown
 # Active Session Context
+> Last Updated: YYYY-MM-DD HH:MM:SS
 
 ## Current Task
 [From Next Steps - what to work on next]

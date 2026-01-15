@@ -29,10 +29,56 @@ else
   SESSIONS_DIR="$PROJECT_DIR/planning/sessions"
 fi
 
+# Staleness threshold in seconds (24 hours)
+STALENESS_THRESHOLD=${HOOK_STALENESS_THRESHOLD:-86400}
+
 # Check if sessions directory exists
 if [[ ! -d "$SESSIONS_DIR" ]]; then
   exit 0
 fi
+
+# === Functions ===
+
+# Check if active-context.md is stale (>24h since last update)
+check_staleness() {
+  local active_context="$SESSIONS_DIR/active-context.md"
+
+  if [[ ! -f "$active_context" ]]; then
+    return 0
+  fi
+
+  # Extract timestamp from "> Last Updated: YYYY-MM-DD HH:MM:SS" line
+  local timestamp_line
+  timestamp_line=$(grep -E "^> Last Updated:" "$active_context" 2>/dev/null || echo "")
+
+  if [[ -z "$timestamp_line" ]]; then
+    # No timestamp found, can't check staleness (backwards compatible)
+    return 0
+  fi
+
+  # Extract the timestamp part
+  local timestamp
+  timestamp=$(echo "$timestamp_line" | sed 's/^> Last Updated: //')
+
+  # Convert timestamp to epoch seconds
+  local context_epoch
+  context_epoch=$(date -d "$timestamp" +%s 2>/dev/null || date -j -f "%Y-%m-%d %H:%M:%S" "$timestamp" +%s 2>/dev/null || echo "")
+
+  if [[ -z "$context_epoch" ]]; then
+    # Could not parse timestamp
+    return 0
+  fi
+
+  local current_epoch
+  current_epoch=$(date +%s)
+
+  local age_seconds=$((current_epoch - context_epoch))
+
+  if [[ $age_seconds -gt $STALENESS_THRESHOLD ]]; then
+    local age_hours=$((age_seconds / 3600))
+    echo "CONTEXT_STALE: active-context.md is stale (last updated ${age_hours}h ago). Consider running /document-and-save to update."
+  fi
+}
 
 # Track if we found any valid pending backups
 found_pending=false
@@ -66,6 +112,11 @@ process_marker() {
   echo "SESSION_BACKUP_PENDING ($marker_type): Backup exists at $backup_path"
   found_pending=true
 }
+
+# === Main ===
+
+# Check for staleness first
+check_staleness
 
 # Check for all marker types
 process_marker "$SESSIONS_DIR/.pending-backup-compact" "compact"

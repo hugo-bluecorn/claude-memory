@@ -300,3 +300,97 @@ function test_session_start_preserves_multiple_markers() {
   assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-compact"
   assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 }
+
+# === Phase 2.1: Staleness Detection Tests ===
+
+function test_session_start_warns_if_context_stale() {
+  # When active-context.md has a timestamp >24h old, should warn
+  local active_context="$HOOK_SESSIONS_DIR/active-context.md"
+
+  # Create active-context.md with an old timestamp (48 hours ago)
+  local old_timestamp
+  old_timestamp=$(date -d "48 hours ago" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -v-48H '+%Y-%m-%d %H:%M:%S' 2>/dev/null)
+
+  cat > "$active_context" << EOF
+# Active Session Context
+> Last Updated: $old_timestamp
+
+## Current Task
+Test task
+EOF
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should contain staleness warning
+  assert_contains "stale" "$stdout_output"
+}
+
+function test_session_start_no_warning_if_context_fresh() {
+  # When active-context.md has a recent timestamp (<24h), no warning
+  local active_context="$HOOK_SESSIONS_DIR/active-context.md"
+
+  # Create active-context.md with a fresh timestamp (1 hour ago)
+  local fresh_timestamp
+  fresh_timestamp=$(date -d "1 hour ago" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -v-1H '+%Y-%m-%d %H:%M:%S' 2>/dev/null)
+
+  cat > "$active_context" << EOF
+# Active Session Context
+> Last Updated: $fresh_timestamp
+
+## Current Task
+Test task
+EOF
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should NOT contain staleness warning
+  assert_not_contains "stale" "$stdout_output"
+}
+
+function test_session_start_no_warning_if_no_timestamp() {
+  # When active-context.md has no timestamp header, no warning (backwards compatible)
+  local active_context="$HOOK_SESSIONS_DIR/active-context.md"
+
+  # Create active-context.md without timestamp
+  cat > "$active_context" << EOF
+# Active Session Context
+
+## Current Task
+Test task
+EOF
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should NOT contain staleness warning
+  assert_not_contains "stale" "$stdout_output"
+}
+
+function test_session_start_no_warning_if_no_active_context() {
+  # When active-context.md doesn't exist, no warning
+  rm -f "$HOOK_SESSIONS_DIR/active-context.md"
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should NOT contain staleness warning
+  assert_not_contains "stale" "$stdout_output"
+}
