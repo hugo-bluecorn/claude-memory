@@ -394,3 +394,89 @@ function test_session_start_no_warning_if_no_active_context() {
   # Should NOT contain staleness warning
   assert_not_contains "stale" "$stdout_output"
 }
+
+# === Phase 2.3: Overhead Warning Tests ===
+
+function test_session_start_warns_large_overhead() {
+  # When context files are >20KB total, should warn about overhead
+  local active_context="$HOOK_SESSIONS_DIR/active-context.md"
+  local project_memory="$HOOK_SESSIONS_DIR/project-memory.md"
+
+  # Create large active-context.md (>20KB = 20480 bytes)
+  # Generate ~25KB of content
+  {
+    echo "# Active Session Context"
+    echo "> Last Updated: $(date '+%Y-%m-%d %H:%M:%S')"
+    echo ""
+    for i in $(seq 1 500); do
+      echo "- This is line $i with some filler content to make the file larger and reach the threshold"
+    done
+  } > "$active_context"
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should contain overhead warning
+  assert_contains "CONTEXT_OVERHEAD" "$stdout_output"
+}
+
+function test_session_start_no_overhead_warning_if_small() {
+  # When context files are <20KB, no overhead warning
+  local active_context="$HOOK_SESSIONS_DIR/active-context.md"
+
+  # Create small active-context.md
+  cat > "$active_context" << EOF
+# Active Session Context
+> Last Updated: $(date '+%Y-%m-%d %H:%M:%S')
+
+## Current Task
+Test task
+EOF
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should NOT contain overhead warning
+  assert_not_contains "CONTEXT_OVERHEAD" "$stdout_output"
+}
+
+function test_session_start_counts_multiple_files_for_overhead() {
+  # Overhead should consider active-context.md + project-memory.md
+  local active_context="$HOOK_SESSIONS_DIR/active-context.md"
+  local project_memory="$HOOK_SESSIONS_DIR/project-memory.md"
+
+  # Create two files that together exceed 20KB but individually don't
+  # ~12KB each = ~24KB total
+  {
+    echo "# Active Session Context"
+    echo "> Last Updated: $(date '+%Y-%m-%d %H:%M:%S')"
+    for i in $(seq 1 250); do
+      echo "- Active context line $i with filler content to reach threshold"
+    done
+  } > "$active_context"
+
+  {
+    echo "# Project Memory"
+    for i in $(seq 1 250); do
+      echo "- Project memory line $i with filler content to reach threshold"
+    done
+  } > "$project_memory"
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should contain overhead warning (combined size)
+  assert_contains "CONTEXT_OVERHEAD" "$stdout_output"
+}

@@ -32,12 +32,41 @@ fi
 # Staleness threshold in seconds (24 hours)
 STALENESS_THRESHOLD=${HOOK_STALENESS_THRESHOLD:-86400}
 
+# Overhead threshold in bytes (20KB)
+OVERHEAD_THRESHOLD=${HOOK_OVERHEAD_THRESHOLD:-20480}
+
 # Check if sessions directory exists
 if [[ ! -d "$SESSIONS_DIR" ]]; then
   exit 0
 fi
 
 # === Functions ===
+
+# Check if context files are too large (>20KB combined)
+check_overhead() {
+  local active_context="$SESSIONS_DIR/active-context.md"
+  local project_memory="$SESSIONS_DIR/project-memory.md"
+  local total_size=0
+
+  # Get size of active-context.md
+  if [[ -f "$active_context" ]]; then
+    local ac_size
+    ac_size=$(wc -c < "$active_context" 2>/dev/null || echo 0)
+    total_size=$((total_size + ac_size))
+  fi
+
+  # Get size of project-memory.md
+  if [[ -f "$project_memory" ]]; then
+    local pm_size
+    pm_size=$(wc -c < "$project_memory" 2>/dev/null || echo 0)
+    total_size=$((total_size + pm_size))
+  fi
+
+  if [[ $total_size -gt $OVERHEAD_THRESHOLD ]]; then
+    local size_kb=$((total_size / 1024))
+    echo "CONTEXT_OVERHEAD: Context files are ${size_kb}KB (threshold: $((OVERHEAD_THRESHOLD / 1024))KB). Consider trimming active-context.md."
+  fi
+}
 
 # Check if active-context.md is stale (>24h since last update)
 check_staleness() {
@@ -117,6 +146,9 @@ process_marker() {
 
 # Check for staleness first
 check_staleness
+
+# Check for context file overhead
+check_overhead
 
 # Check for all marker types
 process_marker "$SESSIONS_DIR/.pending-backup-compact" "compact"
