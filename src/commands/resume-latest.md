@@ -34,6 +34,33 @@ Please follow these steps. Wrap all output at 120 characters maximum.
    ```
 
 **If pending backup(s) exist:**
+
+### Check for Coalesce Opportunity (Compact Backup Only)
+
+If `.pending-backup-compact` exists (but NOT `.pending-backup-exit`), check if coalescing is possible:
+
+1. Look for `> Last Session Doc:` field in `planning/sessions/active-context.md`
+2. If found and the session document exists, **offer coalescing first**:
+
+```
+Detected pending compact backup: [backup-path]
+Last session document: [session-doc-name]
+
+This backup contains delta work done after /document-and-save but before compaction.
+
+Options:
+1. /coalesce - Merge delta into existing session document (recommended if continuing same work)
+2. Continue with /resume-latest - Process backup as a new session
+3. /discard-backup - Discard the backup without processing
+
+Which option? (or proceed with option 2 if --yes flag)
+```
+
+If `--yes` flag is present, proceed with option 2 (process as new session).
+
+### Standard Backup Processing
+
+If coalescing is not offered or user chooses option 2:
 - Read the raw transcript file(s) indicated in the marker(s)
 - Parse the JSONL conversation history (see JSONL Format Reference below)
 - Generate a high-quality summary following the Extraction Strategy
@@ -174,3 +201,4 @@ When parsing a raw transcript, follow this strategy to build a useful summary:
 - **[/resume-from](resume-from.md)** - Detailed steps for loading session context
 - **[/document-and-save](document-and-save.md)** - Creates session documents that this command loads
 - **[/sessions-list](sessions-list.md)** - Browse and select from all available sessions
+- **[/coalesce](coalesce.md)** - Merge delta work from compact backup into last session document

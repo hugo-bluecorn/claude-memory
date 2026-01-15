@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `/coalesce` command for merging delta work into last session document
+- "Last Session Doc" tracking in active-context.md for coalescing support
+- Coalesce detection in `/resume-latest` (offers merge option when compact backup + last session doc exist)
+- Session coalescing documentation in user manual and best practices
 - `/context-stats` command for viewing session management statistics
 - Session chaining: auto-detect and link to previous session in `/document-and-save`
 - Best practices documentation (`docs/best-practices.md`)
@@ -32,8 +36,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PreCompact hook validation and error handling improved
 
 ### Changed
+- `/document-and-save` now records session document path for coalescing support
 - PreCompact hook refactored with structured input parsing
-- `/resume-latest` now documents all three marker types
+- `/resume-latest` now documents all three marker types and offers coalesce option
 
 ## [0.1.0] - 2026-01-15
 

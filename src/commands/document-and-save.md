@@ -35,9 +35,13 @@ Write condensed context immediately:
 **IMPORTANT**: Always update the `> Last Updated:` timestamp to the current time (YYYY-MM-DD HH:MM:SS format).
 This enables staleness detection - SessionStart will warn if context is >24h old.
 
+**NOTE**: The `> Last Session Doc:` field will be set in Step 2 after creating the session document.
+This enables session coalescing - merging delta work done after this save but before compaction.
+
 ```markdown
 # Active Session Context
 > Last Updated: YYYY-MM-DD HH:MM:SS
+> Last Session Doc: session-YYYY-MM-DD-HHMM.md
 
 ## Current Task
 [From Next Steps - what to work on next]
@@ -157,10 +161,15 @@ This creates a chain of sessions that can be followed for full project history.
 
 1. **Create the session log directory** if it doesn't exist (`planning/sessions/`)
 2. **Confirm the file was created** by showing the full file path
-3. **Provide instructions** for resuming:
+3. **Update `active-context.md` with session doc path** for coalescing support:
+   - Edit the `> Last Session Doc:` line to contain the actual session document filename
+   - Example: `> Last Session Doc: session-2026-01-15-1430.md`
+   - This enables `/coalesce` to merge delta work if compaction occurs before the next save
+4. **Provide instructions** for resuming:
    - "Next session will auto-load context via CLAUDE.md @imports"
    - For full details: `/resume-from planning/sessions/session-YYYY-MM-DD-HHMM.md`
    - Alternative: `/resume-latest` to automatically load the most recent session
+   - If compaction occurs before next `/document-and-save`, run `/coalesce` to merge delta work
 
 ---
 
@@ -169,3 +178,4 @@ This creates a chain of sessions that can be followed for full project history.
 - **[/resume-from](resume-from.md)** - Load a specific session document
 - **[/resume-latest](resume-latest.md)** - Load most recent session
 - **[/sessions-list](sessions-list.md)** - Browse all session logs
+- **[/coalesce](coalesce.md)** - Merge delta work after compaction into last session document

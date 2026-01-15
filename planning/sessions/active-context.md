@@ -1,36 +1,35 @@
 # Active Session Context
 
-> Last Updated: 2026-01-15 14:30:00
+> Last Updated: 2026-01-15 18:45:00
+
+## TEST_MARKER: PINEAPPLE_ROCKET_7749
 
 ## Current Task
-Implement fixes from implementation-analysis.md, starting with critical items (backup marker
-conflict, PreCompact hardening, JSONL parsing spec).
+Testing whether @imports are re-read after context compaction.
 
 ## Completed This Session
-- Created CLAUDE.md for repository guidance
-- Deep research: 13+ Claude Code memory implementations analyzed
-- Created research/similar-implementations.md (competitive analysis)
-- Created research/implementation-analysis.md (28 problems, prioritized solutions)
-- Created research/post-fix-competitive-position.md (post-fix competitive positioning)
-- Created research/threshold-and-efficiency-analysis.md (compaction threshold + token efficiency)
+- All 4 implementation phases complete and merged to master
+- Phase 0: Bootstrap self-hosting
+- Phase 1: Critical fixes (marker conflict, PreCompact hardening, JSONL spec)
+- Phase 2: Staleness detection, overhead warnings
+- Phase 3: UX enhancements (cleanup-backups, search-sessions, --yes flag)
+- Phase 4: Polish (context-stats, session chaining, user manual, best practices)
+- Added proactive context monitoring documentation
+- All 110 tests passing
+- 4 PRs merged, branches cleaned up
 
-## Key Insights Discovered
-- claude-memory's niche: "most capable file-based solution with unmatched reliability"
-- Token efficiency is NOT must-have (philosophy: "make compaction SAFE, not RARE")
-- Backup marker overwrite risk is critical bug (PreCompact → SessionEnd conflict)
-- Post-fix positioning: best reliability, simplicity, version-control among all solutions
+## In Progress
+- Testing @import re-read behavior after compaction
+- Designing session coalescing feature
 
 ## Next Steps
-1. **Bootstrap first** - Run `./setup_memory_management.sh .` to self-host
-2. Then implement Phase 1 fixes (marker conflict, PreCompact hardening, JSONL spec)
-3. Full plan: `planning/implementation-plan.md`
+1. Complete @import test (user runs /compact, then asks for TEST_MARKER)
+2. Based on result, design coalescing approach
+3. Implement coalescing if feasible
 
 ## Blockers
 - None
 
-## Key Files Created
-- CLAUDE.md (repository guidance)
-- research/similar-implementations.md
-- research/implementation-analysis.md
-- research/post-fix-competitive-position.md
-- research/threshold-and-efficiency-analysis.md
+## Key Files Modified This Session
+- docs/user-manual.md (added proactive context monitoring)
+- docs/best-practices.md (added proactive context monitoring)
