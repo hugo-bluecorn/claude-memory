@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/on-pre-compact.sh"
+            "command": "bash -c '\"$CLAUDE_PROJECT_DIR/.claude/hooks/on-pre-compact.sh\"'"
           }
         ]
       }
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/on-session-start.sh"
+            "command": "bash -c '\"$CLAUDE_PROJECT_DIR/.claude/hooks/on-session-start.sh\"'"
           }
         ]
       }
@@ -26,7 +26,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/on-session-end.sh"
+            "command": "bash -c '\"$CLAUDE_PROJECT_DIR/.claude/hooks/on-session-end.sh\"'"
           }
         ]
       }

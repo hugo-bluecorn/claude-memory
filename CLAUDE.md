@@ -48,8 +48,8 @@ Hooks in `src/hooks/` are triggered automatically by Claude Code:
 | Hook | Trigger | Purpose |
 |------|---------|---------|
 | `on-session-start.sh` | Session initialization | Outputs `SESSION_BACKUP_PENDING` if pending backup exists |
-| `on-session-end.sh` | `/exit`, `/clear`, logout | Saves raw transcript, creates `.pending-backup` marker |
-| `on-pre-compact.sh` | Context ~90% full | Saves transcript before auto-compaction |
+| `on-session-end.sh` | `/exit`, `/clear`, logout | Saves raw transcript, creates `.pending-backup-exit` marker |
+| `on-pre-compact.sh` | Context ~90% full | Saves transcript, creates `.pending-backup-compact` marker |
 
 ### Command System
 
@@ -60,8 +60,12 @@ Commands in `src/commands/` are markdown prompts Claude follows:
 | `/document-and-save` | Save session to default path with full details |
 | `/resume-latest` | Process pending backup or load most recent session |
 | `/resume-from <path>` | Load specific session document |
+| `/coalesce` | Merge delta work from compaction into last session doc |
 | `/sessions-list` | Browse available sessions |
+| `/search-sessions` | Search across session documents |
+| `/cleanup-backups` | Delete old backups to free space |
 | `/discard-backup` | Discard pending backup without processing |
+| `/context-stats` | View session management statistics |
 
 ### Critical Workflows
 

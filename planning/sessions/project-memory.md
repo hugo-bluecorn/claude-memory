@@ -16,9 +16,9 @@ Permanent knowledge about claude-memory that should persist across all sessions.
 
 ## Known Gotchas
 
-- PreCompact and SessionEnd both write to `.pending-backup` - **BUG: can overwrite each other**
-- `on-pre-compact.sh` is less robust than `on-session-end.sh` - needs hardening
 - SessionStart output goes to Claude context, not user terminal - user may miss it
+- Hook configurations are cached at session startup - changes require restart or `/hooks` menu
+- **Windows**: Hook commands need `bash` prefix for variable expansion (already configured)
 
 ## Important Context
 

@@ -1,38 +1,31 @@
 # Active Session Context
 
-> Last Updated: 2026-01-15 19:55:00
-> Last Session Doc:
+> Last Updated: 2026-01-15 21:55:00
+> Last Session Doc: session-2026-01-15-2045.md
 
 ## Current Task
-Testing the new session coalescing feature.
+Complete coalescing workflow test and merge feature branch.
 
 ## Completed This Session
-- All 4 implementation phases complete and merged to master
-- Implemented session coalescing feature (Phase 5):
-  - Created /coalesce command
-  - Enhanced /document-and-save with Last Session Doc tracking
-  - Enhanced /resume-latest to offer coalesce option
-  - Updated documentation (user-manual.md, best-practices.md)
-  - All 110 tests passing
-- Verified @imports are re-read after compaction (TEST_MARKER test passed)
-- Researched why auto-coalescing is impossible (no PostCompact hook, behavioral drift)
+- Fixed Windows hook compatibility in `.claude/settings.json`
+  - Added `bash` prefix to all hook commands
+  - Original: `"$CLAUDE_PROJECT_DIR"/.claude/hooks/...`
+  - Fixed: `bash "$CLAUDE_PROJECT_DIR/.claude/hooks/..."`
+- Discovered hooks are cached at session startup (don't reload on /clear)
+- Documented that `/hooks` menu or session restart required to apply hook changes
+- **Verified Windows hook fix works** - `/compact` ran PreCompact hook successfully
+- **Tested coalescing workflow** - ran `/coalesce` to merge delta work
 
 ## In Progress
-- Testing coalescing workflow end-to-end
+- Completing coalescing workflow (verifying it worked)
 
 ## Next Steps
-1. Run /document-and-save to create a session doc
-2. Continue working (make some changes)
-3. Run /compact manually
-4. Test /coalesce or /resume-latest coalesce detection
+1. Merge feature/session-coalescing to master
+2. Investigate why custom commands don't show in autocomplete (optional)
 
 ## Blockers
-- None
+None
 
-## Key Files Modified This Session
-- src/commands/coalesce.md (new)
-- src/commands/document-and-save.md (added Last Session Doc)
-- src/commands/resume-latest.md (added coalesce option)
-- docs/user-manual.md (coalescing workflow)
-- docs/best-practices.md (coalescing guidance)
-- CHANGELOG.md (feature entry)
+## Key Files Modified
+- .claude/settings.json (Windows hook fix)
+- planning/sessions/session-2026-01-15-2045.md (coalesced continuation)

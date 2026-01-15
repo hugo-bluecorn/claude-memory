@@ -34,6 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Legacy `.pending-backup` still supported for backward compatibility
 - PreCompact hook now skips empty transcript files (parity with SessionEnd)
 - PreCompact hook validation and error handling improved
+- **Windows compatibility**: Hook commands now use `bash` prefix for cross-platform support
+  - Windows CMD/PowerShell doesn't expand `$VARIABLE` syntax
+  - `bash "$CLAUDE_PROJECT_DIR/..."` ensures bash handles variable expansion
 
 ### Changed
 - `/document-and-save` now records session document path for coalescing support

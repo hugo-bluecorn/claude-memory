@@ -82,7 +82,7 @@ curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/set
            "hooks": [
              {
                "type": "command",
-               "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/on-pre-compact.sh"
+               "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/on-pre-compact.sh\""
              }
            ]
          }
@@ -92,7 +92,7 @@ curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/set
            "hooks": [
              {
                "type": "command",
-               "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/on-session-start.sh"
+               "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/on-session-start.sh\""
              }
            ]
          }
@@ -102,7 +102,7 @@ curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/set
            "hooks": [
              {
                "type": "command",
-               "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/on-session-end.sh"
+               "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/on-session-end.sh\""
              }
            ]
          }
@@ -110,6 +110,8 @@ curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/set
      }
    }
    ```
+
+   > **Note**: The `bash` prefix ensures cross-platform compatibility (required on Windows).
 
 3. Add session management section to your `.claude/CLAUDE.md`:
    - Copy contents of `CLAUDE.md.snippet` and append to your CLAUDE.md
@@ -122,6 +124,7 @@ curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/set
 | `/document-and-save-to <path>` | Save session to a custom path |
 | `/resume-latest` | Process pending backup or load most recent session |
 | `/resume-from <path>` | Load a specific session document |
+| `/coalesce` | Merge delta work from compaction into last session document |
 | `/sessions-list` | Browse all available session logs |
 | `/search-sessions <keyword>` | Search across session documents |
 | `/cleanup-backups` | Delete old backups to free space |
@@ -161,6 +164,7 @@ your-project/
 │   │   ├── document-and-save.md
 │   │   ├── resume-latest.md
 │   │   ├── resume-from.md
+│   │   ├── coalesce.md
 │   │   ├── sessions-list.md
 │   │   ├── search-sessions.md
 │   │   ├── cleanup-backups.md
