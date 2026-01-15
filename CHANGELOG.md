@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Staleness detection for active-context.md (warns if >24h old, configurable via `HOOK_STALENESS_THRESHOLD`)
+- Context overhead warning (warns if combined context files >20KB, configurable via `HOOK_OVERHEAD_THRESHOLD`)
+- Timestamp header in active-context.md template (`> Last Updated:`)
 - JSONL Format Reference section in `/resume-latest` command
 - Extraction Strategy documentation for processing raw transcripts
 - Multi-marker detection in SessionStart hook
