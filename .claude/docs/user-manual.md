@@ -57,7 +57,7 @@ Claude Memory solves a fundamental problem: Claude Code sessions are ephemeral. 
 │  │                    COMMANDS (manual)                  │                   │
 │  │  /document-and-save  /resume-latest  /search-sessions │                   │
 │  │  /resume-from        /sessions-list  /cleanup-backups │                   │
-│  │  /discard-backup     /context-stats                   │                   │
+│  │  /discard-backup     /context-stats  /coalesce        │                   │
 │  └──────────────────────────────────────────────────────┘                   │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -239,7 +239,8 @@ project/
 │   │   ├── search-sessions.md
 │   │   ├── cleanup-backups.md
 │   │   ├── discard-backup.md
-│   │   └── context-stats.md
+│   │   ├── context-stats.md
+│   │   └── coalesce.md
 │   │
 │   ├── hooks/              # Lifecycle hooks
 │   │   ├── on-session-start.sh
@@ -297,6 +298,12 @@ project/
 |---------|---------|-------------|
 | `/sessions-list` | Browse available sessions | Finding past work |
 | `/search-sessions <keyword>` | Search session content | Finding specific context |
+
+### Session Coalescing
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `/coalesce` | Merge delta work into last session doc | After compaction, when continuing same work |
 
 ### Maintenance
 
@@ -382,6 +389,36 @@ cd claude-memory
    └─► SessionStart detects pending backup
    └─► Run /resume-latest to restore context
 ```
+
+### Session Coalescing (Delta Work)
+
+If you run `/document-and-save` and then continue working before compaction occurs:
+
+```
+1. /document-and-save at T=0
+   └─► Creates session-2026-01-15-1800.md
+   └─► Records "Last Session Doc" in active-context.md
+
+2. Continue working...
+   └─► More changes, decisions, progress
+
+3. PreCompact triggers at T=5 (context full)
+   └─► Backs up transcript to raw/YYYYMMDD_compact.jsonl
+   └─► Context is compacted
+
+4. After compaction, /resume-latest detects:
+   └─► Pending compact backup exists
+   └─► Last Session Doc is set
+   └─► Offers: /coalesce OR process as new session
+
+5. Run /coalesce
+   └─► Merges delta work into session-2026-01-15-1800.md
+   └─► Adds "Session Continuation" section
+   └─► Cleans up backup marker
+```
+
+**When to use `/coalesce`**: When you want to keep related work in a single session document
+rather than creating multiple session files for the same logical work session.
 
 ### Proactive Context Monitoring
 

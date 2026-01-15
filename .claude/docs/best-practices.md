@@ -132,6 +132,28 @@ Use `/search-sessions` to find relevant past work:
 
 Sessions automatically link to their predecessor via `previous_session` in frontmatter. This creates a traceable history of work.
 
+### Session Coalescing
+
+When compaction occurs after a `/document-and-save`, you have a choice:
+
+**Use `/coalesce` when:**
+- You're continuing the same logical work session
+- The delta work is closely related to the saved session
+- You want a single comprehensive session document
+
+**Use `/resume-latest` (process as new session) when:**
+- You're starting a new task or topic
+- The delta work is unrelated to the previous save
+- You prefer smaller, more focused session documents
+
+**How it works:**
+1. `/document-and-save` records `> Last Session Doc:` in active-context.md
+2. If compaction occurs, PreCompact backs up the transcript
+3. `/resume-latest` detects both markers and offers `/coalesce`
+4. `/coalesce` appends a "Session Continuation" section to the existing document
+
+**Tip**: If you frequently use `/document-and-save` mid-session, coalescing helps maintain a coherent session history.
+
 ## Troubleshooting
 
 ### "Context is stale" Warning
@@ -196,6 +218,7 @@ export HOOK_OVERHEAD_THRESHOLD=51200
 | `/resume-from <path>` | Load specific session |
 | `/sessions-list` | Browse available sessions |
 | `/search-sessions <keyword>` | Search session content |
+| `/coalesce` | Merge delta work into last session document |
 | `/cleanup-backups` | Remove old backups |
 | `/discard-backup` | Discard pending backup |
 | `/context-stats` | View context statistics |

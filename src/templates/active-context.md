@@ -1,5 +1,6 @@
 # Active Session Context
 > Last Updated: [YYYY-MM-DD HH:MM:SS]
+> Last Session Doc: [session-YYYY-MM-DD-HHMM.md or empty if none]
 
 ## Current Task
 [What you're currently working on or should work on next]

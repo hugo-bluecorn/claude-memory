@@ -16,3 +16,11 @@ Thumbs.db
 # Backup files
 *.bak
 *.backup
+
+# Claude Code local settings (user-specific)
+.claude/settings.local.json
+
+# Session management runtime files
+planning/sessions/raw/
+planning/sessions/.backup-log
+planning/sessions/.pending-backup*
