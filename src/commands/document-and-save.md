@@ -62,14 +62,26 @@ This enables staleness detection - SessionStart will warn if context is >24h old
 
 Create a comprehensive session document in `planning/sessions/session-YYYY-MM-DD-HHMM.md` with:
 
-   Start with YAML frontmatter:
+### Auto-detect Previous Session
+
+Before creating the document, find the most recent existing session:
+
+```bash
+ls -t planning/sessions/session-*.md 2>/dev/null | head -1
+```
+
+If a previous session exists, set `previous_session` to its relative path (e.g., `session-2026-01-14-1430.md`).
+This creates a chain of sessions that can be followed for full project history.
+
+### YAML Frontmatter
+
    ```yaml
    ---
    date: YYYY-MM-DD HH:MM
    project: <infer from cwd name or package.json>
    status: completed | in-progress | blocked
    tags: [relevant, keywords, for, this, session]
-   previous_session: <path to previous session if this is a continuation, or null>
+   previous_session: <most recent session file, or null if first session>
    branch: <current git branch, omit if not a git repo>
    ---
    ```

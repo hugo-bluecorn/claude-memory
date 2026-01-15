@@ -2,6 +2,37 @@
 
 A session continuity system for Claude Code that automatically preserves context across sessions.
 
+## System Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         SESSION LIFECYCLE                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+   START SESSION              WORK                    END SESSION
+        │                      │                           │
+        ▼                      ▼                           ▼
+  ┌───────────┐         ┌───────────┐              ┌───────────┐
+  │ Session   │         │ PreCompact│              │ SessionEnd│
+  │ Start     │         │ Hook      │              │ Hook      │
+  │ Hook      │         │ (backup)  │              │ (backup)  │
+  └─────┬─────┘         └─────┬─────┘              └─────┬─────┘
+        │                     │                          │
+        ▼                     ▼                          ▼
+  ┌───────────┐         ┌───────────┐              ┌───────────┐
+  │ Detect    │         │ Context   │              │ Create    │
+  │ pending   │         │ saved to  │              │ backup    │
+  │ backups   │         │ raw/      │              │ marker    │
+  └─────┬─────┘         └───────────┘              └───────────┘
+        │
+        ▼
+  ┌───────────────────┐
+  │ /resume-latest    │
+  │ to restore        │
+  │ context           │
+  └───────────────────┘
+```
+
 ## What This Does
 
 Claude Code sessions have limited context. When context fills up or you exit, valuable information can be lost. This system provides:
@@ -9,6 +40,7 @@ Claude Code sessions have limited context. When context fills up or you exit, va
 - **Automatic backups** - Hooks save raw transcripts when sessions end or auto-compact
 - **Session documents** - Create structured summaries of your work with `/document-and-save`
 - **Easy resumption** - Restore context with `/resume-latest` or `/resume-from`
+- **Searchable history** - Find past work with `/search-sessions`
 - **Permanent memory** - Store project knowledge in `project-memory.md`
 
 ## Quick Start
@@ -91,7 +123,12 @@ curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/set
 | `/resume-latest` | Process pending backup or load most recent session |
 | `/resume-from <path>` | Load a specific session document |
 | `/sessions-list` | Browse all available session logs |
+| `/search-sessions <keyword>` | Search across session documents |
+| `/cleanup-backups` | Delete old backups to free space |
 | `/discard-backup` | Discard pending backup without processing |
+| `/context-stats` | View session management statistics |
+
+Use `--yes` flag with `/resume-latest` or `/resume-from` to skip confirmation prompts.
 
 ## How It Works
 
@@ -122,24 +159,27 @@ your-project/
 ├── .claude/
 │   ├── commands/
 │   │   ├── document-and-save.md
-│   │   ├── document-and-save-to.md
-│   │   ├── resume-from.md
 │   │   ├── resume-latest.md
+│   │   ├── resume-from.md
 │   │   ├── sessions-list.md
-│   │   └── discard-backup.md
+│   │   ├── search-sessions.md
+│   │   ├── cleanup-backups.md
+│   │   ├── discard-backup.md
+│   │   └── context-stats.md
 │   ├── hooks/
-│   │   ├── on-pre-compact.sh
+│   │   ├── on-session-start.sh
 │   │   ├── on-session-end.sh
-│   │   └── on-session-start.sh
+│   │   └── on-pre-compact.sh
 │   └── scripts/
 │       └── discard-backup.sh
 │
 └── planning/sessions/
-    ├── active-context.md    # Current session state (auto-loaded)
-    ├── project-memory.md    # Permanent knowledge (auto-loaded)
-    ├── session-*.md         # Archived session documents
-    ├── raw/                 # Raw transcript backups
-    └── .pending-backup      # Marker for unprocessed backup
+    ├── active-context.md        # Current session state (auto-loaded)
+    ├── project-memory.md        # Permanent knowledge (auto-loaded)
+    ├── session-*.md             # Archived session documents
+    ├── .pending-backup-exit     # Exit backup marker
+    ├── .pending-backup-compact  # Compact backup marker
+    └── raw/                     # Raw transcript backups
 ```
 
 ## Testing
@@ -167,7 +207,9 @@ This system includes comprehensive tests using bashunit:
 
 ## Documentation
 
-- [Session Continuity Workflow](docs/session-continuity-workflow.md) - Full system documentation
+- **[User Manual](docs/user-manual.md)** - Complete guide with workflow diagrams
+- **[Best Practices](docs/best-practices.md)** - Tips for effective usage
+- [Session Continuity Workflow](docs/session-continuity-workflow.md) - Detailed system design
 - [Bash Testing Guide](docs/bash-testing-guide.md) - How to write tests for bash scripts
 - [Version Control](docs/version-control.md) - Git workflow and commit conventions
 
