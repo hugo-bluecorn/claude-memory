@@ -45,7 +45,8 @@ if [[ -f "$TRANSCRIPT" ]]; then
   cp "$TRANSCRIPT" "$BACKUP_PATH"
 
   # Create pending marker with backup path
-  echo "$BACKUP_PATH" > "$SESSIONS_DIR/.pending-backup"
+  # Uses .pending-backup-compact to avoid conflict with SessionEnd's .pending-backup-exit
+  echo "$BACKUP_PATH" > "$SESSIONS_DIR/.pending-backup-compact"
 
   # Log the event
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] PreCompact ($TRIGGER): Saved backup to $BACKUP_PATH" >> "$SESSIONS_DIR/.backup-log"

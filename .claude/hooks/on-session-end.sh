@@ -91,10 +91,11 @@ create_backup() {
 }
 
 # Create pending backup marker
+# Uses .pending-backup-exit to avoid conflict with PreCompact's .pending-backup-compact
 create_pending_marker() {
   local backup_path="$1"
-  echo "$backup_path" > "$SESSIONS_DIR/.pending-backup"
-  log_debug "Created pending marker"
+  echo "$backup_path" > "$SESSIONS_DIR/.pending-backup-exit"
+  log_debug "Created pending marker (.pending-backup-exit)"
 }
 
 # Update backup log
