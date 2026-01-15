@@ -300,3 +300,183 @@ function test_session_start_preserves_multiple_markers() {
   assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-compact"
   assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 }
+
+# === Phase 2.1: Staleness Detection Tests ===
+
+function test_session_start_warns_if_context_stale() {
+  # When active-context.md has a timestamp >24h old, should warn
+  local active_context="$HOOK_SESSIONS_DIR/active-context.md"
+
+  # Create active-context.md with an old timestamp (48 hours ago)
+  local old_timestamp
+  old_timestamp=$(date -d "48 hours ago" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -v-48H '+%Y-%m-%d %H:%M:%S' 2>/dev/null)
+
+  cat > "$active_context" << EOF
+# Active Session Context
+> Last Updated: $old_timestamp
+
+## Current Task
+Test task
+EOF
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should contain staleness warning
+  assert_contains "stale" "$stdout_output"
+}
+
+function test_session_start_no_warning_if_context_fresh() {
+  # When active-context.md has a recent timestamp (<24h), no warning
+  local active_context="$HOOK_SESSIONS_DIR/active-context.md"
+
+  # Create active-context.md with a fresh timestamp (1 hour ago)
+  local fresh_timestamp
+  fresh_timestamp=$(date -d "1 hour ago" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -v-1H '+%Y-%m-%d %H:%M:%S' 2>/dev/null)
+
+  cat > "$active_context" << EOF
+# Active Session Context
+> Last Updated: $fresh_timestamp
+
+## Current Task
+Test task
+EOF
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should NOT contain staleness warning
+  assert_not_contains "stale" "$stdout_output"
+}
+
+function test_session_start_no_warning_if_no_timestamp() {
+  # When active-context.md has no timestamp header, no warning (backwards compatible)
+  local active_context="$HOOK_SESSIONS_DIR/active-context.md"
+
+  # Create active-context.md without timestamp
+  cat > "$active_context" << EOF
+# Active Session Context
+
+## Current Task
+Test task
+EOF
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should NOT contain staleness warning
+  assert_not_contains "stale" "$stdout_output"
+}
+
+function test_session_start_no_warning_if_no_active_context() {
+  # When active-context.md doesn't exist, no warning
+  rm -f "$HOOK_SESSIONS_DIR/active-context.md"
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should NOT contain staleness warning
+  assert_not_contains "stale" "$stdout_output"
+}
+
+# === Phase 2.3: Overhead Warning Tests ===
+
+function test_session_start_warns_large_overhead() {
+  # When context files are >20KB total, should warn about overhead
+  local active_context="$HOOK_SESSIONS_DIR/active-context.md"
+  local project_memory="$HOOK_SESSIONS_DIR/project-memory.md"
+
+  # Create large active-context.md (>20KB = 20480 bytes)
+  # Generate ~25KB of content
+  {
+    echo "# Active Session Context"
+    echo "> Last Updated: $(date '+%Y-%m-%d %H:%M:%S')"
+    echo ""
+    for i in $(seq 1 500); do
+      echo "- This is line $i with some filler content to make the file larger and reach the threshold"
+    done
+  } > "$active_context"
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should contain overhead warning
+  assert_contains "CONTEXT_OVERHEAD" "$stdout_output"
+}
+
+function test_session_start_no_overhead_warning_if_small() {
+  # When context files are <20KB, no overhead warning
+  local active_context="$HOOK_SESSIONS_DIR/active-context.md"
+
+  # Create small active-context.md
+  cat > "$active_context" << EOF
+# Active Session Context
+> Last Updated: $(date '+%Y-%m-%d %H:%M:%S')
+
+## Current Task
+Test task
+EOF
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should NOT contain overhead warning
+  assert_not_contains "CONTEXT_OVERHEAD" "$stdout_output"
+}
+
+function test_session_start_counts_multiple_files_for_overhead() {
+  # Overhead should consider active-context.md + project-memory.md
+  local active_context="$HOOK_SESSIONS_DIR/active-context.md"
+  local project_memory="$HOOK_SESSIONS_DIR/project-memory.md"
+
+  # Create two files that together exceed 20KB but individually don't
+  # ~12KB each = ~24KB total
+  {
+    echo "# Active Session Context"
+    echo "> Last Updated: $(date '+%Y-%m-%d %H:%M:%S')"
+    for i in $(seq 1 250); do
+      echo "- Active context line $i with filler content to reach threshold"
+    done
+  } > "$active_context"
+
+  {
+    echo "# Project Memory"
+    for i in $(seq 1 250); do
+      echo "- Project memory line $i with filler content to reach threshold"
+    done
+  } > "$project_memory"
+
+  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
+  local stdout_output
+  local exit_code=0
+
+  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+  # Should contain overhead warning (combined size)
+  assert_contains "CONTEXT_OVERHEAD" "$stdout_output"
+}
