@@ -33,7 +33,7 @@ preserves context across sessions using hooks, and provides commands for manual 
 │   └── scripts/
 │       └── discard-backup.sh        # Script for /discard-backup command
 │
-└── planning/sessions/
+└── .claude/memory/
     ├── active-context.md            # Current state (auto-loaded via @import)
     ├── project-memory.md            # Permanent knowledge (auto-loaded)
     ├── session-*.md                 # Archived session documents
@@ -112,7 +112,7 @@ All commands are markdown files in `.claude/commands/`. They define prompts that
 
 ### /document-and-save
 
-Save session to default path: `planning/sessions/session-YYYY-MM-DD-HHMM.md`
+Save session to default path: `.claude/memory/session-YYYY-MM-DD-HHMM.md`
 
 **Steps**:
 1. Check for pending backup (inform user if exists)

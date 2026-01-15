@@ -15,8 +15,8 @@ function test_create_test_environment_creates_directories() {
   local test_dir
   test_dir=$(create_test_environment)
 
-  assert_directory_exists "$test_dir/planning/sessions/raw"
-  assert_file_exists "$test_dir/planning/sessions/active-context.md"
+  assert_directory_exists "$test_dir/.claude/memory/raw"
+  assert_file_exists "$test_dir/.claude/memory/active-context.md"
 
   # Cleanup
   rm -rf "$test_dir"

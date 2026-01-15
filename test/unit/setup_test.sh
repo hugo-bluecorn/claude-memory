@@ -59,21 +59,21 @@ function test_setup_creates_claude_scripts_directory() {
 }
 
 function test_setup_creates_sessions_directory() {
-  # When setup runs, it should create planning/sessions/
+  # When setup runs, it should create .claude/memory/
   local target="$TEST_DIR/target"
 
   bash "$SCRIPT_PATH" "$target"
 
-  assert_directory_exists "$target/planning/sessions"
+  assert_directory_exists "$target/.claude/memory"
 }
 
 function test_setup_creates_raw_directory() {
-  # When setup runs, it should create planning/sessions/raw/
+  # When setup runs, it should create .claude/memory/raw/
   local target="$TEST_DIR/target"
 
   bash "$SCRIPT_PATH" "$target"
 
-  assert_directory_exists "$target/planning/sessions/raw"
+  assert_directory_exists "$target/.claude/memory/raw"
 }
 
 # === File Copy Tests - Commands ===
@@ -169,7 +169,7 @@ function test_setup_creates_active_context() {
 
   bash "$SCRIPT_PATH" "$target"
 
-  assert_file_exists "$target/planning/sessions/active-context.md"
+  assert_file_exists "$target/.claude/memory/active-context.md"
 }
 
 function test_setup_creates_project_memory() {
@@ -177,7 +177,7 @@ function test_setup_creates_project_memory() {
 
   bash "$SCRIPT_PATH" "$target"
 
-  assert_file_exists "$target/planning/sessions/project-memory.md"
+  assert_file_exists "$target/.claude/memory/project-memory.md"
 }
 
 # === Error Handling Tests ===
@@ -197,7 +197,7 @@ function test_setup_uses_current_dir_with_no_arguments() {
 
   # Should create .claude in current directory
   assert_directory_exists "$TEST_DIR/target/.claude/commands"
-  assert_directory_exists "$TEST_DIR/target/planning/sessions"
+  assert_directory_exists "$TEST_DIR/target/.claude/memory"
 }
 
 # === Idempotency Tests ===
@@ -219,13 +219,13 @@ function test_setup_is_idempotent() {
 function test_setup_does_not_overwrite_existing_active_context() {
   # If active-context.md has custom content, it should be preserved
   local target="$TEST_DIR/target"
-  mkdir -p "$target/planning/sessions"
-  echo "Custom content" > "$target/planning/sessions/active-context.md"
+  mkdir -p "$target/.claude/memory"
+  echo "Custom content" > "$target/.claude/memory/active-context.md"
 
   bash "$SCRIPT_PATH" "$target"
 
   local content
-  content=$(cat "$target/planning/sessions/active-context.md")
+  content=$(cat "$target/.claude/memory/active-context.md")
   assert_contains "Custom content" "$content"
 }
 

@@ -28,9 +28,9 @@ Please follow these steps. Wrap all output at 120 characters maximum.
 2. Otherwise, check for markers:
    ```bash
    # Check all marker types (newest is usually most relevant)
-   cat planning/sessions/.pending-backup-exit 2>/dev/null
-   cat planning/sessions/.pending-backup-compact 2>/dev/null
-   cat planning/sessions/.pending-backup 2>/dev/null
+   cat .claude/memory/.pending-backup-exit 2>/dev/null
+   cat .claude/memory/.pending-backup-compact 2>/dev/null
+   cat .claude/memory/.pending-backup 2>/dev/null
    ```
 
 **If pending backup(s) exist:**
@@ -39,7 +39,7 @@ Please follow these steps. Wrap all output at 120 characters maximum.
 
 If `.pending-backup-compact` exists (but NOT `.pending-backup-exit`), check if coalescing is possible:
 
-1. Look for `> Last Session Doc:` field in `planning/sessions/active-context.md`
+1. Look for `> Last Session Doc:` field in `.claude/memory/active-context.md`
 2. If found and the session document exists, **offer coalescing first**:
 
 ```
@@ -64,8 +64,8 @@ If coalescing is not offered or user chooses option 2:
 - Read the raw transcript file(s) indicated in the marker(s)
 - Parse the JSONL conversation history (see JSONL Format Reference below)
 - Generate a high-quality summary following the Extraction Strategy
-- Update `planning/sessions/active-context.md` with the summary
-- Optionally create a session document: `planning/sessions/session-YYYY-MM-DD-HHMM.md`
+- Update `.claude/memory/active-context.md` with the summary
+- Optionally create a session document: `.claude/memory/session-YYYY-MM-DD-HHMM.md`
 - Delete the processed marker file(s)
 - Continue to step 3 (skip steps 1-2 since we just processed the latest)
 
@@ -78,12 +78,12 @@ If no markers exist, continue to step 1.
 Compare timestamps from two sources:
 
 **A. Session Documents:**
-- Look in `planning/sessions/` directory
+- Look in `.claude/memory/` directory
 - Find all `.md` files matching the pattern `session-YYYY-MM-DD-HHMM.md`
 - Sort by the date/time in the filename (newest first)
 
 **B. Raw Transcripts (if no session documents or transcripts are newer):**
-- Look in `planning/sessions/raw/` directory
+- Look in `.claude/memory/raw/` directory
 - Find all `.jsonl` files
 - Sort by timestamp in filename (newest first)
 
@@ -92,7 +92,7 @@ Compare timestamps from two sources:
 - Otherwise, use the session document
 
 If no sessions or raw transcripts exist:
-- Inform the user: "No session logs found in `planning/sessions/`"
+- Inform the user: "No session logs found in `.claude/memory/`"
 - Offer to start fresh or ask if sessions are stored elsewhere
 
 ## 2. Confirm Before Proceeding
@@ -127,8 +127,8 @@ Follow all steps from the `/resume-from` command:
 2. Extract conversation history using the JSONL Format Reference below
 3. Apply the Extraction Strategy to identify key information
 4. Generate a high-quality summary following the session document format
-5. Update `planning/sessions/active-context.md` with condensed summary
-6. Optionally save full summary to `planning/sessions/session-YYYY-MM-DD-HHMM.md`
+5. Update `.claude/memory/active-context.md` with condensed summary
+6. Optionally save full summary to `.claude/memory/session-YYYY-MM-DD-HHMM.md`
 7. Present summary and next steps to user
 
 See `/resume-from` for detailed instructions on each step.
@@ -190,9 +190,9 @@ When parsing a raw transcript, follow this strategy to build a useful summary:
 
 ## Notes
 
-**Auto-loaded context**: `planning/sessions/active-context.md` is automatically loaded via CLAUDE.md `@import`. This provides basic continuity without running any command. Use `/resume-latest` when you need full detailed context from the session document.
+**Auto-loaded context**: `.claude/memory/active-context.md` is automatically loaded via CLAUDE.md `@import`. This provides basic continuity without running any command. Use `/resume-latest` when you need full detailed context from the session document.
 
-**SessionEnd hook**: Raw transcripts in `planning/sessions/raw/` are automatically saved by the SessionEnd hook when sessions end via /exit. These can be processed by this command to recover context.
+**SessionEnd hook**: Raw transcripts in `.claude/memory/raw/` are automatically saved by the SessionEnd hook when sessions end via /exit. These can be processed by this command to recover context.
 
 ---
 

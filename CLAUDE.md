@@ -35,10 +35,10 @@ Auto-loaded context (CLAUDE.md @imports)
 └── project-memory.md    # Permanent project knowledge
 
 Manual session documents
-└── planning/sessions/session-YYYY-MM-DD-HHMM.md
+└── .claude/memory/sessions/session-YYYY-MM-DD-HHMM.md
 
 Raw backups (safety net)
-└── planning/sessions/raw/*.jsonl
+└── .claude/memory/raw/*.jsonl
 ```
 
 ### Hook System
@@ -103,8 +103,8 @@ Uses GitHub Flow with conventional commits. Commit format: `<type>(<scope>): <su
 
 ## Session Context
 
-@planning/sessions/active-context.md
+@.claude/memory/active-context.md
 
 ## Project Knowledge
 
-@planning/sessions/project-memory.md
+@.claude/memory/project-memory.md

@@ -20,10 +20,10 @@ Calculate the size of files that are auto-loaded into context:
 
 ```bash
 # Active context
-wc -c planning/sessions/active-context.md 2>/dev/null || echo "0"
+wc -c .claude/memory/active-context.md 2>/dev/null || echo "0"
 
 # Project memory
-wc -c planning/sessions/project-memory.md 2>/dev/null || echo "0"
+wc -c .claude/memory/project-memory.md 2>/dev/null || echo "0"
 ```
 
 Display:
@@ -47,7 +47,7 @@ If total > 20KB, show warning:
 Parse the `> Last Updated:` timestamp from active-context.md:
 
 ```bash
-grep "^> Last Updated:" planning/sessions/active-context.md 2>/dev/null
+grep "^> Last Updated:" .claude/memory/active-context.md 2>/dev/null
 ```
 
 Display:
@@ -67,7 +67,7 @@ If > 24h old:
 ### 3. Count Session Documents
 
 ```bash
-ls planning/sessions/session-*.md 2>/dev/null | wc -l
+ls .claude/memory/session-*.md 2>/dev/null | wc -l
 ```
 
 Display:
@@ -82,8 +82,8 @@ Session Documents
 ### 4. Count Raw Backups
 
 ```bash
-ls planning/sessions/raw/*.jsonl 2>/dev/null | wc -l
-du -sh planning/sessions/raw/ 2>/dev/null
+ls .claude/memory/raw/*.jsonl 2>/dev/null | wc -l
+du -sh .claude/memory/raw/ 2>/dev/null
 ```
 
 Display:
@@ -99,9 +99,9 @@ Raw Backups
 ### 5. Check Pending Backups
 
 ```bash
-cat planning/sessions/.pending-backup-exit 2>/dev/null
-cat planning/sessions/.pending-backup-compact 2>/dev/null
-cat planning/sessions/.pending-backup 2>/dev/null
+cat .claude/memory/.pending-backup-exit 2>/dev/null
+cat .claude/memory/.pending-backup-compact 2>/dev/null
+cat .claude/memory/.pending-backup 2>/dev/null
 ```
 
 Display:

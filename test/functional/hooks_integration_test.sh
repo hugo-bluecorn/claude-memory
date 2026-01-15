@@ -14,7 +14,7 @@ function set_up() {
   # Create isolated test environment for each test
   TEST_DIR=$(create_test_environment)
   export HOOK_PROJECT_DIR="$TEST_DIR"
-  export HOOK_SESSIONS_DIR="$TEST_DIR/planning/sessions"
+  export HOOK_SESSIONS_DIR="$TEST_DIR/.claude/memory"
 }
 
 function tear_down() {

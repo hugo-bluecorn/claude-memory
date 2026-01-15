@@ -20,9 +20,9 @@ Please follow these steps. Wrap all output at 120 characters maximum.
 1. If your SessionStart context includes `SESSION_BACKUP_PENDING`, extract the backup path(s) from that message.
 2. Otherwise, check the marker files:
    ```bash
-   cat planning/sessions/.pending-backup-exit 2>/dev/null
-   cat planning/sessions/.pending-backup-compact 2>/dev/null
-   cat planning/sessions/.pending-backup 2>/dev/null
+   cat .claude/memory/.pending-backup-exit 2>/dev/null
+   cat .claude/memory/.pending-backup-compact 2>/dev/null
+   cat .claude/memory/.pending-backup 2>/dev/null
    ```
 
 If a pending backup exists:
@@ -47,7 +47,7 @@ If no pending backup exists, continue to Step 1.
 
 - Read the file at: $ARGUMENTS
 - If the file is not found or $ARGUMENTS is empty:
-  - List available sessions in `planning/sessions/`
+  - List available sessions in `.claude/memory/`
   - Ask which session to load, or offer to load the most recent one
 - If the path is a directory, list sessions in that directory
 
@@ -137,7 +137,7 @@ Once the user chooses how to proceed, use all the restored context to inform you
 
 ## Notes
 
-**Auto-loaded context**: `planning/sessions/active-context.md` is automatically loaded via CLAUDE.md `@import`. This provides a condensed version of the most recent session state. Use `/resume-from` when you need the full detailed context.
+**Auto-loaded context**: `.claude/memory/active-context.md` is automatically loaded via CLAUDE.md `@import`. This provides a condensed version of the most recent session state. Use `/resume-from` when you need the full detailed context.
 
 ---
 

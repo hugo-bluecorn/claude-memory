@@ -64,7 +64,8 @@ echo "Creating directory structure..."
 mkdir -p "$TARGET_DIR/.claude/commands"
 mkdir -p "$TARGET_DIR/.claude/hooks"
 mkdir -p "$TARGET_DIR/.claude/scripts"
-mkdir -p "$TARGET_DIR/planning/sessions/raw"
+mkdir -p "$TARGET_DIR/.claude/memory/raw"
+mkdir -p "$TARGET_DIR/.claude/memory/sessions"
 
 # === Copy Commands ===
 echo "Copying commands..."
@@ -97,14 +98,14 @@ done
 
 # === Copy Templates (only if not existing) ===
 echo "Setting up session files..."
-if [[ ! -f "$TARGET_DIR/planning/sessions/active-context.md" ]]; then
-  cp "$SCRIPT_DIR/src/templates/active-context.md" "$TARGET_DIR/planning/sessions/active-context.md"
+if [[ ! -f "$TARGET_DIR/.claude/memory/active-context.md" ]]; then
+  cp "$SCRIPT_DIR/src/templates/active-context.md" "$TARGET_DIR/.claude/memory/active-context.md"
 else
   echo -e "${YELLOW}  Skipping active-context.md (already exists)${NC}"
 fi
 
-if [[ ! -f "$TARGET_DIR/planning/sessions/project-memory.md" ]]; then
-  cp "$SCRIPT_DIR/src/templates/project-memory.md" "$TARGET_DIR/planning/sessions/project-memory.md"
+if [[ ! -f "$TARGET_DIR/.claude/memory/project-memory.md" ]]; then
+  cp "$SCRIPT_DIR/src/templates/project-memory.md" "$TARGET_DIR/.claude/memory/project-memory.md"
 else
   echo -e "${YELLOW}  Skipping project-memory.md (already exists)${NC}"
 fi

@@ -26,7 +26,7 @@ fi
 if [[ -n "${HOOK_SESSIONS_DIR:-}" ]]; then
   SESSIONS_DIR="$HOOK_SESSIONS_DIR"
 else
-  SESSIONS_DIR="$PROJECT_DIR/planning/sessions"
+  SESSIONS_DIR="$PROJECT_DIR/.claude/memory"
 fi
 
 # Staleness threshold in seconds (24 hours)

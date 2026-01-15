@@ -12,7 +12,7 @@ If your SessionStart context includes `SESSION_BACKUP_PENDING`, extract the back
 
 Otherwise, check the marker file:
 ```bash
-cat planning/sessions/.pending-backup 2>/dev/null
+cat .claude/memory/.pending-backup 2>/dev/null
 ```
 
 If a pending backup exists, display it prominently before the session list:
@@ -22,12 +22,12 @@ If a pending backup exists, display it prominently before the session list:
 
 ## 1. Find All Sessions
 
-- Look in `planning/sessions/` directory
+- Look in `.claude/memory/` directory
 - Find all `.md` files
 - Sort by date (newest first, based on filename pattern `session-YYYY-MM-DD-HHMM.md`)
 
 If the directory doesn't exist or is empty:
-- Inform the user: "No session logs found in `planning/sessions/`. Use `/document-and-save` to create your first session log."
+- Inform the user: "No session logs found in `.claude/memory/`. Use `/document-and-save` to create your first session log."
 - End here
 
 ## 2. Display Session List
