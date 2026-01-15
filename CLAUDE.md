@@ -94,3 +94,13 @@ Test files follow pattern: `test/unit/*_test.sh` for unit tests, `test/functiona
 ## Git Workflow
 
 Uses GitHub Flow with conventional commits. Commit format: `<type>(<scope>): <subject>` where type is feat/fix/docs/refactor/test/chore.
+
+---
+
+## Session Context
+
+@planning/sessions/active-context.md
+
+## Project Knowledge
+
+@planning/sessions/project-memory.md
