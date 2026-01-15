@@ -2,8 +2,11 @@
 # PreCompact hook tests
 # Tests for src/hooks/on-pre-compact.sh
 
-# Path to the hook under test (relative to test/unit)
-HOOK_PATH="../../src/hooks/on-pre-compact.sh"
+# Get the directory where this test file is located
+TEST_FILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Path to the hook under test (absolute path based on test file location)
+HOOK_PATH="$TEST_FILE_DIR/../../src/hooks/on-pre-compact.sh"
 
 function set_up() {
   # Create isolated test environment for each test
@@ -64,6 +67,7 @@ function test_pre_compact_creates_backup() {
 
 function test_pre_compact_creates_pending_marker() {
   # Pending backup marker should be created with backup path
+  # NOTE: As of Phase 1.1, PreCompact uses .pending-backup-compact
   local transcript_file="$TEST_DIR/transcript.jsonl"
   create_test_transcript "$transcript_file"
 
@@ -71,12 +75,12 @@ function test_pre_compact_creates_pending_marker() {
 
   echo "$json" | bash "$HOOK_PATH" 2>&1
 
-  # Pending marker should exist
-  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup"
+  # Pending marker should exist (using new name)
+  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-compact"
 
   # Marker should contain path to backup
   local marker_content
-  marker_content=$(cat "$HOOK_SESSIONS_DIR/.pending-backup")
+  marker_content=$(cat "$HOOK_SESSIONS_DIR/.pending-backup-compact")
   assert_contains ".jsonl" "$marker_content"
 }
 
@@ -232,4 +236,112 @@ function test_pre_compact_backup_preserves_content() {
   backup_hash=$(md5sum "$backup_file" | cut -d' ' -f1)
 
   assert_equals "$original_hash" "$backup_hash"
+}
+
+# === Phase 1.1: Multi-Marker Support Tests ===
+# These tests enforce the new marker naming convention to prevent overwrites
+
+function test_pre_compact_creates_compact_marker() {
+  # PreCompact should use .pending-backup-compact (not .pending-backup)
+  # This prevents overwrites when SessionEnd also runs
+  local transcript_file="$TEST_DIR/transcript.jsonl"
+  create_test_transcript "$transcript_file"
+
+  local json="{\"transcript_path\":\"$transcript_file\",\"trigger\":\"auto\",\"session_id\":\"test-123\"}"
+  echo "$json" | bash "$HOOK_PATH" 2>&1
+
+  # New marker should exist
+  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-compact"
+
+  # Old marker should NOT exist (breaking change)
+  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup"
+
+  # Marker should contain backup path
+  local marker_content
+  marker_content=$(cat "$HOOK_SESSIONS_DIR/.pending-backup-compact")
+  assert_contains ".jsonl" "$marker_content"
+}
+
+function test_pre_compact_does_not_overwrite_exit_marker() {
+  # If .pending-backup-exit exists, PreCompact should not touch it
+  local transcript_file="$TEST_DIR/transcript.jsonl"
+  create_test_transcript "$transcript_file"
+
+  # Pre-create an exit marker
+  echo "/path/to/exit-backup.jsonl" > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
+
+  local json="{\"transcript_path\":\"$transcript_file\",\"trigger\":\"auto\",\"session_id\":\"test-123\"}"
+  echo "$json" | bash "$HOOK_PATH" 2>&1
+
+  # Exit marker should be preserved
+  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
+  local exit_content
+  exit_content=$(cat "$HOOK_SESSIONS_DIR/.pending-backup-exit")
+  assert_contains "exit-backup" "$exit_content"
+
+  # Compact marker should also exist
+  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-compact"
+}
+
+# === Phase 1.2: PreCompact Hardening Tests ===
+# These tests enforce parity with SessionEnd's robustness
+
+function test_pre_compact_skips_empty_transcript_file() {
+  # Empty transcript file should be skipped (not backed up)
+  # This achieves parity with SessionEnd's behavior
+  local transcript_file="$TEST_DIR/empty_transcript.jsonl"
+  touch "$transcript_file"  # Empty file
+
+  local json="{\"transcript_path\":\"$transcript_file\",\"trigger\":\"auto\",\"session_id\":\"test-123\"}"
+  local exit_code=0
+
+  echo "$json" | bash "$HOOK_PATH" 2>&1 || exit_code=$?
+
+  assert_equals "0" "$exit_code"
+
+  # No backup should be created for empty file
+  local backup_count
+  backup_count=$(find "$HOOK_SESSIONS_DIR/raw" -name "*.jsonl" -type f 2>/dev/null | wc -l)
+  assert_equals "0" "$backup_count"
+
+  # No marker should be created
+  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup-compact"
+}
+
+function test_pre_compact_logs_debug_when_enabled() {
+  # When HOOK_DEBUG=true, should write to debug log
+  local transcript_file="$TEST_DIR/transcript.jsonl"
+  create_test_transcript "$transcript_file"
+
+  export HOOK_DEBUG=true
+  local json="{\"transcript_path\":\"$transcript_file\",\"trigger\":\"auto\",\"session_id\":\"test-123\"}"
+  echo "$json" | bash "$HOOK_PATH" 2>&1
+  unset HOOK_DEBUG
+
+  # Debug log should exist with content
+  assert_file_exists "$HOOK_SESSIONS_DIR/.debug-log"
+  local log_content
+  log_content=$(cat "$HOOK_SESSIONS_DIR/.debug-log")
+  assert_contains "PreCompact" "$log_content"
+}
+
+function test_pre_compact_updates_active_context() {
+  # PreCompact should update active-context.md with compaction info
+  local transcript_file="$TEST_DIR/transcript.jsonl"
+  create_test_transcript "$transcript_file"
+
+  # Create initial active-context.md
+  echo "# Active Session Context" > "$HOOK_SESSIONS_DIR/active-context.md"
+  echo "" >> "$HOOK_SESSIONS_DIR/active-context.md"
+  echo "## Current Task" >> "$HOOK_SESSIONS_DIR/active-context.md"
+  echo "Test task" >> "$HOOK_SESSIONS_DIR/active-context.md"
+
+  local json="{\"transcript_path\":\"$transcript_file\",\"trigger\":\"auto\",\"session_id\":\"test-123\"}"
+  echo "$json" | bash "$HOOK_PATH" 2>&1
+
+  # Active context should contain compaction info
+  local context_content
+  context_content=$(cat "$HOOK_SESSIONS_DIR/active-context.md")
+  assert_contains "Compaction" "$context_content"
+  assert_contains "auto" "$context_content"
 }

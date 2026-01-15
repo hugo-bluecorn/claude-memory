@@ -2,8 +2,11 @@
 # DiscardBackup script tests
 # Tests for src/scripts/discard-backup.sh
 
-# Path to the script under test (relative to test/unit)
-SCRIPT_PATH="../../src/scripts/discard-backup.sh"
+# Get the directory where this test file is located
+TEST_FILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Path to the script under test (absolute path based on test file location)
+SCRIPT_PATH="$TEST_FILE_DIR/../../src/scripts/discard-backup.sh"
 
 function set_up() {
   # Create isolated test environment for each test

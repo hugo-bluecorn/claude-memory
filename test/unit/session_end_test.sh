@@ -2,8 +2,11 @@
 # SessionEnd hook tests
 # Tests for src/hooks/on-session-end.sh
 
-# Path to the hook under test (relative to test/unit)
-HOOK_PATH="../../src/hooks/on-session-end.sh"
+# Get the directory where this test file is located
+TEST_FILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Path to the hook under test (absolute path based on test file location)
+HOOK_PATH="$TEST_FILE_DIR/../../src/hooks/on-session-end.sh"
 
 function set_up() {
   # Create isolated test environment for each test
@@ -124,6 +127,7 @@ function test_session_end_creates_backup_successfully() {
 
 function test_session_end_creates_pending_marker() {
   # Pending backup marker should be created with backup path
+  # NOTE: As of Phase 1.1, SessionEnd uses .pending-backup-exit
   local transcript_file="$TEST_DIR/transcript.jsonl"
   create_test_transcript "$transcript_file"
 
@@ -132,12 +136,12 @@ function test_session_end_creates_pending_marker() {
 
   echo "$json" | bash "$HOOK_PATH" 2>&1
 
-  # Pending marker should exist
-  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup"
+  # Pending marker should exist (using new name)
+  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 
   # Marker should contain path to backup
   local marker_content
-  marker_content=$(cat "$HOOK_SESSIONS_DIR/.pending-backup")
+  marker_content=$(cat "$HOOK_SESSIONS_DIR/.pending-backup-exit")
   assert_contains ".jsonl" "$marker_content"
 }
 
@@ -451,4 +455,51 @@ function test_session_end_multiple_runs_create_separate_backups() {
   local backup_count
   backup_count=$(find "$HOOK_SESSIONS_DIR/raw" -name "*.jsonl" -type f 2>/dev/null | wc -l)
   assert_equals "2" "$backup_count"
+}
+
+# === Phase 1.1: Multi-Marker Support Tests ===
+# These tests enforce the new marker naming convention to prevent overwrites
+
+function test_session_end_creates_exit_marker() {
+  # SessionEnd should use .pending-backup-exit (not .pending-backup)
+  # This prevents overwrites when PreCompact also runs
+  local transcript_file="$TEST_DIR/transcript.jsonl"
+  create_test_transcript "$transcript_file"
+
+  local json
+  json=$(mock_hook_input "$transcript_file" "prompt_input_exit" "session-123")
+  echo "$json" | bash "$HOOK_PATH" 2>&1
+
+  # New marker should exist
+  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
+
+  # Old marker should NOT exist (breaking change)
+  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup"
+
+  # Marker should contain backup path
+  local marker_content
+  marker_content=$(cat "$HOOK_SESSIONS_DIR/.pending-backup-exit")
+  assert_contains ".jsonl" "$marker_content"
+}
+
+function test_session_end_does_not_overwrite_compact_marker() {
+  # If .pending-backup-compact exists, SessionEnd should not touch it
+  local transcript_file="$TEST_DIR/transcript.jsonl"
+  create_test_transcript "$transcript_file"
+
+  # Pre-create a compact marker
+  echo "/path/to/compact-backup.jsonl" > "$HOOK_SESSIONS_DIR/.pending-backup-compact"
+
+  local json
+  json=$(mock_hook_input "$transcript_file" "prompt_input_exit" "session-123")
+  echo "$json" | bash "$HOOK_PATH" 2>&1
+
+  # Compact marker should be preserved
+  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-compact"
+  local compact_content
+  compact_content=$(cat "$HOOK_SESSIONS_DIR/.pending-backup-compact")
+  assert_contains "compact-backup" "$compact_content"
+
+  # Exit marker should also exist
+  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 }
