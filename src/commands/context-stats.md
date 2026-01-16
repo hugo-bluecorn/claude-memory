@@ -67,7 +67,7 @@ If > 24h old:
 ### 3. Count Session Documents
 
 ```bash
-ls .claude/memory/session-*.md 2>/dev/null | wc -l
+ls .claude/memory/sessions/session-*.md 2>/dev/null | wc -l
 ```
 
 Display:

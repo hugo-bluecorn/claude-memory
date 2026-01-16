@@ -65,7 +65,7 @@ If coalescing is not offered or user chooses option 2:
 - Parse the JSONL conversation history (see JSONL Format Reference below)
 - Generate a high-quality summary following the Extraction Strategy
 - Update `.claude/memory/active-context.md` with the summary
-- Optionally create a session document: `.claude/memory/session-YYYY-MM-DD-HHMM.md`
+- Optionally create a session document: `.claude/memory/sessions/session-YYYY-MM-DD-HHMM.md`
 - Delete the processed marker file(s)
 - Continue to step 3 (skip steps 1-2 since we just processed the latest)
 
@@ -128,7 +128,7 @@ Follow all steps from the `/resume-from` command:
 3. Apply the Extraction Strategy to identify key information
 4. Generate a high-quality summary following the session document format
 5. Update `.claude/memory/active-context.md` with condensed summary
-6. Optionally save full summary to `.claude/memory/session-YYYY-MM-DD-HHMM.md`
+6. Optionally save full summary to `.claude/memory/sessions/session-YYYY-MM-DD-HHMM.md`
 7. Present summary and next steps to user
 
 See `/resume-from` for detailed instructions on each step.

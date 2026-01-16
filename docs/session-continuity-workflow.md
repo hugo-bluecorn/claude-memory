@@ -16,31 +16,33 @@ preserves context across sessions using hooks, and provides commands for manual 
 
 ```
 <your-project>/
-├── .claude/
-│   ├── CLAUDE.md                    # Session rules + @imports
-│   ├── settings.json                # Hook configurations
-│   ├── commands/                    # Slash command definitions
-│   │   ├── document-and-save.md     # Save session (default path)
-│   │   ├── document-and-save-to.md  # Save session (custom path)
-│   │   ├── resume-latest.md         # Resume most recent session
-│   │   ├── resume-from.md           # Resume specific session
-│   │   ├── sessions-list.md         # List available sessions
-│   │   └── discard-backup.md        # Discard pending backup
-│   ├── hooks/
-│   │   ├── on-session-start.sh      # Outputs context if pending backup
-│   │   ├── on-session-end.sh        # Saves transcript on exit
-│   │   └── on-pre-compact.sh        # Saves transcript before compaction
-│   └── scripts/
-│       └── discard-backup.sh        # Script for /discard-backup command
-│
-└── .claude/memory/
-    ├── active-context.md            # Current state (auto-loaded via @import)
-    ├── project-memory.md            # Permanent knowledge (auto-loaded)
-    ├── session-*.md                 # Archived session documents
-    ├── raw/                         # Raw transcript backups
-    │   └── YYYYMMDD_HHMMSS_*.jsonl
-    ├── .pending-backup              # Marker file (contains path to backup)
-    └── .backup-log                  # Log of backup events
+└── .claude/
+    ├── CLAUDE.md                    # Session rules + @imports
+    ├── settings.json                # Hook configurations
+    ├── commands/                    # Slash command definitions
+    │   ├── document-and-save.md     # Save session (default path)
+    │   ├── document-and-save-to.md  # Save session (custom path)
+    │   ├── resume-latest.md         # Resume most recent session
+    │   ├── resume-from.md           # Resume specific session
+    │   ├── coalesce.md              # Merge delta work into session
+    │   ├── sessions-list.md         # List available sessions
+    │   ├── search-sessions.md       # Search across sessions
+    │   ├── cleanup-backups.md       # Delete old backups
+    │   ├── discard-backup.md        # Discard pending backup
+    │   └── context-stats.md         # View statistics
+    ├── hooks/
+    │   ├── on-session-start.sh      # Outputs context if pending backup
+    │   ├── on-session-end.sh        # Saves transcript on exit
+    │   └── on-pre-compact.sh        # Saves transcript before compaction
+    ├── scripts/
+    │   └── discard-backup.sh        # Script for /discard-backup
+    └── memory/
+        ├── active-context.md        # Current state (auto-loaded)
+        ├── project-memory.md        # Permanent knowledge (auto-loaded)
+        ├── sessions/                # Archived session documents
+        │   └── session-*.md
+        └── raw/                     # Raw transcript backups
+            └── YYYYMMDD_HHMMSS_*.jsonl
 ```
 
 ### Auto-Loaded Files
@@ -112,7 +114,7 @@ All commands are markdown files in `.claude/commands/`. They define prompts that
 
 ### /document-and-save
 
-Save session to default path: `.claude/memory/session-YYYY-MM-DD-HHMM.md`
+Save session to default path: `.claude/memory/sessions/session-YYYY-MM-DD-HHMM.md`
 
 **Steps**:
 1. Check for pending backup (inform user if exists)

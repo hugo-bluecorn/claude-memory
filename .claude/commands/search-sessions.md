@@ -28,7 +28,7 @@ Search through all session documents to find past work, decisions, or context.
 Search in `.claude/memory/` for session documents:
 
 ```bash
-ls .claude/memory/session-*.md 2>/dev/null
+ls .claude/memory/sessions/session-*.md 2>/dev/null
 ```
 
 If no session documents exist, inform the user and suggest running `/document-and-save`.
@@ -38,7 +38,7 @@ If no session documents exist, inform the user and suggest running `/document-an
 Use grep to find matches across all session files:
 
 ```bash
-grep -n -i "<keyword>" .claude/memory/session-*.md
+grep -n -i "<keyword>" .claude/memory/sessions/session-*.md
 ```
 
 ### 3. Parse and Format Results

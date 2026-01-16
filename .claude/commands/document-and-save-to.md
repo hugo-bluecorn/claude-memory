@@ -4,7 +4,7 @@ description: Document session to specified file path. Usage: /document-and-save-
 
 # Document and Save to Custom Path
 
-Document session to: **$ARGUMENTS** (or default: `.claude/memory/session-YYYY-MM-DD-HHMM.md`)
+Document session to: **$ARGUMENTS** (or default: `.claude/memory/sessions/session-YYYY-MM-DD-HHMM.md`)
 
 Please follow these steps. Wrap all output at 120 characters maximum.
 

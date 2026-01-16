@@ -14,16 +14,16 @@ This project uses an automated session continuity system with hooks and commands
 |------|---------|-------------|
 | `.claude/memory/active-context.md` | Current session state | Yes |
 | `.claude/memory/project-memory.md` | Permanent project knowledge | Yes |
+| `.claude/memory/sessions/session-*.md` | Archived session documents | No |
 | `.claude/memory/raw/*.jsonl` | Raw transcript backups | No |
-| `.claude/memory/.pending-backup` | Marker for unprocessed backup | No |
 
 ## Hooks (Automatic)
 
 | Hook | Trigger | Action |
 |------|---------|--------|
-| `on-session-end.sh` | `/exit`, `/clear`, logout | Saves transcript + creates marker |
-| `on-pre-compact.sh` | Context ~90% full | Saves transcript + creates marker |
-| `on-session-start.sh` | Session starts | Outputs `SESSION_BACKUP_PENDING` if marker exists |
+| `on-session-end.sh` | `/exit`, `/clear`, logout | Saves transcript, creates `.pending-backup-exit` |
+| `on-pre-compact.sh` | Context ~90% full | Saves transcript, creates `.pending-backup-compact` |
+| `on-session-start.sh` | Session starts | Outputs `SESSION_BACKUP_PENDING` if backup exists |
 
 ## Commands (Manual)
 
@@ -33,8 +33,12 @@ This project uses an automated session continuity system with hooks and commands
 | `/document-and-save-to <path>` | Save session summary to specific path |
 | `/resume-latest` | Process pending backup or load most recent session |
 | `/resume-from <path>` | Load specific session document |
+| `/coalesce` | Merge delta work from compaction into last session doc |
 | `/sessions-list` | Browse available session logs |
+| `/search-sessions <keyword>` | Search across session documents |
+| `/cleanup-backups` | Delete old backup files |
 | `/discard-backup` | Discard pending backup without processing |
+| `/context-stats` | View session management statistics |
 
 ## Rules for Session Management
 
@@ -47,7 +51,7 @@ This project uses an automated session continuity system with hooks and commands
    - Read the raw JSONL backup file
    - Parse conversation history and generate summary
    - Update `active-context.md`
-   - Delete the `.pending-backup` marker
+   - Delete the `.pending-backup-*` marker
 
 3. **Context recovery is opt-in**:
    - SessionStart hook outputs to stdout (visible to Claude, not user)

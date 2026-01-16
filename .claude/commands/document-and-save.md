@@ -64,14 +64,14 @@ This enables session coalescing - merging delta work done after this save but be
 
 ## Step 2: Create Full Session Document
 
-Create a comprehensive session document in `.claude/memory/session-YYYY-MM-DD-HHMM.md` with:
+Create a comprehensive session document in `.claude/memory/sessions/session-YYYY-MM-DD-HHMM.md` with:
 
 ### Auto-detect Previous Session
 
 Before creating the document, find the most recent existing session:
 
 ```bash
-ls -t .claude/memory/session-*.md 2>/dev/null | head -1
+ls -t .claude/memory/sessions/session-*.md 2>/dev/null | head -1
 ```
 
 If a previous session exists, set `previous_session` to its relative path (e.g., `session-2026-01-14-1430.md`).
@@ -167,7 +167,7 @@ This creates a chain of sessions that can be followed for full project history.
    - This enables `/coalesce` to merge delta work if compaction occurs before the next save
 4. **Provide instructions** for resuming:
    - "Next session will auto-load context via CLAUDE.md @imports"
-   - For full details: `/resume-from .claude/memory/session-YYYY-MM-DD-HHMM.md`
+   - For full details: `/resume-from .claude/memory/sessions/session-YYYY-MM-DD-HHMM.md`
    - Alternative: `/resume-latest` to automatically load the most recent session
    - If compaction occurs before next `/document-and-save`, run `/coalesce` to merge delta work
 

@@ -230,38 +230,35 @@ Claude Memory solves a fundamental problem: Claude Code sessions are ephemeral. 
 
 ```
 project/
-├── .claude/
-│   ├── commands/           # Slash commands
-│   │   ├── document-and-save.md
-│   │   ├── resume-latest.md
-│   │   ├── resume-from.md
-│   │   ├── sessions-list.md
-│   │   ├── search-sessions.md
-│   │   ├── cleanup-backups.md
-│   │   ├── discard-backup.md
-│   │   ├── context-stats.md
-│   │   └── coalesce.md
-│   │
-│   ├── hooks/              # Lifecycle hooks
-│   │   ├── on-session-start.sh
-│   │   ├── on-session-end.sh
-│   │   └── on-pre-compact.sh
-│   │
-│   ├── scripts/            # Utility scripts
-│   │   └── discard-backup.sh
-│   │
-│   └── settings.json       # Hook configuration
-│
-└── planning/
-    └── sessions/
-        ├── active-context.md       # Current state (auto-loaded)
-        ├── project-memory.md       # Persistent info (auto-loaded)
-        ├── session-*.md            # Session documents
-        ├── .pending-backup-exit    # Exit backup marker
-        ├── .pending-backup-compact # Compact backup marker
-        ├── .backup-log             # Backup history
-        └── raw/                    # Raw transcript backups
-            └── *.jsonl
+└── .claude/
+    ├── commands/               # Slash commands
+    │   ├── document-and-save.md
+    │   ├── resume-latest.md
+    │   ├── resume-from.md
+    │   ├── coalesce.md
+    │   ├── sessions-list.md
+    │   ├── search-sessions.md
+    │   ├── cleanup-backups.md
+    │   ├── discard-backup.md
+    │   └── context-stats.md
+    │
+    ├── hooks/                  # Lifecycle hooks
+    │   ├── on-session-start.sh
+    │   ├── on-session-end.sh
+    │   └── on-pre-compact.sh
+    │
+    ├── scripts/                # Utility scripts
+    │   └── discard-backup.sh
+    │
+    ├── memory/                 # Session data
+    │   ├── active-context.md   # Current state (auto-loaded)
+    │   ├── project-memory.md   # Persistent info (auto-loaded)
+    │   ├── sessions/           # Session documents
+    │   │   └── session-*.md
+    │   └── raw/                # Raw transcript backups
+    │       └── *.jsonl
+    │
+    └── settings.json           # Hook configuration
 ```
 
 ### File Purposes

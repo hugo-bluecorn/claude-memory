@@ -120,7 +120,7 @@ curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/set
 
 | Command | Description |
 |---------|-------------|
-| `/document-and-save` | Save current session to `.claude/memory/session-YYYY-MM-DD-HHMM.md` |
+| `/document-and-save` | Save current session to `.claude/memory/sessions/session-YYYY-MM-DD-HHMM.md` |
 | `/document-and-save-to <path>` | Save session to a custom path |
 | `/resume-latest` | Process pending backup or load most recent session |
 | `/resume-from <path>` | Load a specific session document |
@@ -159,31 +159,30 @@ After installation, your project will have:
 
 ```
 your-project/
-├── .claude/
-│   ├── commands/
-│   │   ├── document-and-save.md
-│   │   ├── resume-latest.md
-│   │   ├── resume-from.md
-│   │   ├── coalesce.md
-│   │   ├── sessions-list.md
-│   │   ├── search-sessions.md
-│   │   ├── cleanup-backups.md
-│   │   ├── discard-backup.md
-│   │   └── context-stats.md
-│   ├── hooks/
-│   │   ├── on-session-start.sh
-│   │   ├── on-session-end.sh
-│   │   └── on-pre-compact.sh
-│   └── scripts/
-│       └── discard-backup.sh
-│
-└── .claude/memory/
-    ├── active-context.md        # Current session state (auto-loaded)
-    ├── project-memory.md        # Permanent knowledge (auto-loaded)
-    ├── session-*.md             # Archived session documents
-    ├── .pending-backup-exit     # Exit backup marker
-    ├── .pending-backup-compact  # Compact backup marker
-    └── raw/                     # Raw transcript backups
+└── .claude/
+    ├── commands/
+    │   ├── document-and-save.md
+    │   ├── resume-latest.md
+    │   ├── resume-from.md
+    │   ├── coalesce.md
+    │   ├── sessions-list.md
+    │   ├── search-sessions.md
+    │   ├── cleanup-backups.md
+    │   ├── discard-backup.md
+    │   └── context-stats.md
+    ├── hooks/
+    │   ├── on-session-start.sh
+    │   ├── on-session-end.sh
+    │   └── on-pre-compact.sh
+    ├── scripts/
+    │   └── discard-backup.sh
+    ├── memory/
+    │   ├── active-context.md        # Current session state (auto-loaded)
+    │   ├── project-memory.md        # Permanent knowledge (auto-loaded)
+    │   ├── sessions/                # Archived session documents
+    │   │   └── session-*.md
+    │   └── raw/                     # Raw transcript backups
+    └── settings.json
 ```
 
 ## Testing
