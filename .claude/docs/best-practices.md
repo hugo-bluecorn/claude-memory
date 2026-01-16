@@ -222,3 +222,5 @@ export HOOK_OVERHEAD_THRESHOLD=51200
 | `/cleanup-backups` | Remove old backups |
 | `/discard-backup` | Discard pending backup |
 | `/context-stats` | View context statistics |
+| `/fresh-start` | Clear session data, reset to clean state |
+| `/fresh-start-all` | Full reset including project-memory |

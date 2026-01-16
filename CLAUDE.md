@@ -58,6 +58,7 @@ Commands in `src/commands/` are markdown prompts Claude follows:
 | Command | Purpose |
 |---------|---------|
 | `/document-and-save` | Save session to default path with full details |
+| `/document-and-save-to <path>` | Save session to custom path |
 | `/resume-latest` | Process pending backup or load most recent session |
 | `/resume-from <path>` | Load specific session document |
 | `/coalesce` | Merge delta work from compaction into last session doc |
@@ -66,6 +67,8 @@ Commands in `src/commands/` are markdown prompts Claude follows:
 | `/cleanup-backups` | Delete old backups to free space |
 | `/discard-backup` | Discard pending backup without processing |
 | `/context-stats` | View session management statistics |
+| `/fresh-start` | Clear session data, reset to clean state |
+| `/fresh-start-all` | Full reset including project-memory |
 
 ### Critical Workflows
 

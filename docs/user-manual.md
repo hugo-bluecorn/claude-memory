@@ -247,9 +247,9 @@ project/
     │   └── sessions-list.md
     │
     ├── hooks/                  # Lifecycle hooks
-    │   ├── on-session-start.sh
+    │   ├── on-pre-compact.sh
     │   ├── on-session-end.sh
-    │   └── on-pre-compact.sh
+    │   └── on-session-start.sh
     │
     ├── scripts/                # Utility scripts
     │   ├── discard-backup.sh

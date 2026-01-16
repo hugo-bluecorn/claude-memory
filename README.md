@@ -62,23 +62,33 @@ bash setup_memory_management.sh .
 
 ### Manual Installation
 
+First clone the repository, then copy files to your project:
+
+```bash
+git clone https://github.com/hugo-bluecorn/claude-memory.git
+cd claude-memory
+```
+
 1. Copy the files to your project:
    ```bash
-   # Commands
-   cp -r src/commands/* .claude/commands/
+   TARGET=/path/to/your/project
 
-   # Hooks
-   cp -r src/hooks/* .claude/hooks/
-   chmod +x .claude/hooks/*.sh
+   # Create directories
+   mkdir -p $TARGET/.claude/commands
+   mkdir -p $TARGET/.claude/hooks
+   mkdir -p $TARGET/.claude/scripts
+   mkdir -p $TARGET/.claude/memory/raw
+   mkdir -p $TARGET/.claude/memory/sessions
 
-   # Scripts
-   cp -r src/scripts/* .claude/scripts/
-   chmod +x .claude/scripts/*.sh
+   # Copy files
+   cp src/commands/*.md $TARGET/.claude/commands/
+   cp src/hooks/*.sh $TARGET/.claude/hooks/
+   cp src/scripts/*.sh $TARGET/.claude/scripts/
+   cp src/templates/*.md $TARGET/.claude/memory/
 
-   # Create sessions directory
-   mkdir -p .claude/memory/raw
-   cp src/templates/active-context.md .claude/memory/
-   cp src/templates/project-memory.md .claude/memory/
+   # Make scripts executable
+   chmod +x $TARGET/.claude/hooks/*.sh
+   chmod +x $TARGET/.claude/scripts/*.sh
    ```
 
 2. Merge hooks into your `.claude/settings.json`:
@@ -172,19 +182,22 @@ After installation, your project will have:
 your-project/
 └── .claude/
     ├── commands/
-    │   ├── document-and-save.md
-    │   ├── resume-latest.md
-    │   ├── resume-from.md
-    │   ├── coalesce.md
-    │   ├── sessions-list.md
-    │   ├── search-sessions.md
     │   ├── cleanup-backups.md
+    │   ├── coalesce.md
+    │   ├── context-stats.md
     │   ├── discard-backup.md
-    │   └── context-stats.md
+    │   ├── document-and-save.md
+    │   ├── document-and-save-to.md
+    │   ├── fresh-start.md
+    │   ├── fresh-start-all.md
+    │   ├── resume-from.md
+    │   ├── resume-latest.md
+    │   ├── search-sessions.md
+    │   └── sessions-list.md
     ├── hooks/
-    │   ├── on-session-start.sh
+    │   ├── on-pre-compact.sh
     │   ├── on-session-end.sh
-    │   └── on-pre-compact.sh
+    │   └── on-session-start.sh
     ├── scripts/
     │   ├── discard-backup.sh
     │   └── fresh-start.sh

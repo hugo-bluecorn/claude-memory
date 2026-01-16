@@ -20,22 +20,25 @@ preserves context across sessions using hooks, and provides commands for manual 
     ├── CLAUDE.md                    # Session rules + @imports
     ├── settings.json                # Hook configurations
     ├── commands/                    # Slash command definitions
+    │   ├── cleanup-backups.md       # Delete old backups
+    │   ├── coalesce.md              # Merge delta work into session
+    │   ├── context-stats.md         # View statistics
+    │   ├── discard-backup.md        # Discard pending backup
     │   ├── document-and-save.md     # Save session (default path)
     │   ├── document-and-save-to.md  # Save session (custom path)
-    │   ├── resume-latest.md         # Resume most recent session
+    │   ├── fresh-start.md           # Reset session state
+    │   ├── fresh-start-all.md       # Full reset including project-memory
     │   ├── resume-from.md           # Resume specific session
-    │   ├── coalesce.md              # Merge delta work into session
-    │   ├── sessions-list.md         # List available sessions
+    │   ├── resume-latest.md         # Resume most recent session
     │   ├── search-sessions.md       # Search across sessions
-    │   ├── cleanup-backups.md       # Delete old backups
-    │   ├── discard-backup.md        # Discard pending backup
-    │   └── context-stats.md         # View statistics
+    │   └── sessions-list.md         # List available sessions
     ├── hooks/
-    │   ├── on-session-start.sh      # Outputs context if pending backup
+    │   ├── on-pre-compact.sh        # Saves transcript before compaction
     │   ├── on-session-end.sh        # Saves transcript on exit
-    │   └── on-pre-compact.sh        # Saves transcript before compaction
+    │   └── on-session-start.sh      # Outputs context if pending backup
     ├── scripts/
-    │   └── discard-backup.sh        # Script for /discard-backup
+    │   ├── discard-backup.sh        # Script for /discard-backup
+    │   └── fresh-start.sh           # Script for /fresh-start
     └── memory/
         ├── active-context.md        # Current state (auto-loaded)
         ├── project-memory.md        # Permanent knowledge (auto-loaded)
