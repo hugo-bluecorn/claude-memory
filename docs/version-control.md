@@ -96,12 +96,25 @@ main (protected, always deployable)
 
 ### Completing Work
 
-1. **Ensure all tests pass:** `flutter test`
-2. **Ensure analysis passes:** `flutter analyze`
-3. **Ensure code is formatted:** `dart format .`
-4. **Update CHANGELOG.md** (required for every PR)
-5. **Push final changes**
-6. **Create Pull Request** (see PR Guidelines below)
+1. **Run all tests** and ensure they pass
+2. **Run static analysis** and fix any issues
+3. **Update CHANGELOG.md** (required for every commit)
+4. **Update documentation** affected by the changes:
+   - README.md if features/usage changed
+   - User manual if commands/workflows changed
+   - Other docs as needed
+5. **Verify documentation consistency** across all files
+6. **Push final changes**
+7. **Create Pull Request** (see PR Guidelines below)
+
+### Pre-Commit Checklist
+
+Before every commit, verify:
+
+- [ ] All tests pass
+- [ ] CHANGELOG.md updated
+- [ ] Relevant documentation updated
+- [ ] Documentation is consistent across files
 
 ---
 

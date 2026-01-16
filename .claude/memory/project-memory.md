@@ -7,6 +7,7 @@ Permanent knowledge about claude-memory that should persist across all sessions.
 - **Update order matters**: Always update `active-context.md` FIRST, then full session document
 - **Hooks are testable**: Use `HOOK_PROJECT_DIR` and `HOOK_SESSIONS_DIR` env vars for isolation
 - **Graceful degradation**: Hooks exit 0 even on errors to avoid blocking Claude Code
+- **Pre-commit sync**: Always sync `src/` to `.claude/` before committing (commands, hooks, scripts)
 
 ## Architecture Decisions
 

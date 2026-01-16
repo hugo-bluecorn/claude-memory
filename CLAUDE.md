@@ -99,6 +99,22 @@ Test files follow pattern: `test/unit/*_test.sh` for unit tests, `test/functiona
 
 Uses GitHub Flow with conventional commits. Commit format: `<type>(<scope>): <subject>` where type is feat/fix/docs/refactor/test/chore.
 
+### Pre-Commit Checklist (Project-Specific)
+
+Before committing any feature/fix in this repository:
+
+1. **Run all tests:** `./test/lib/bashunit --boot test/bootstrap.sh test/`
+2. **Update CHANGELOG.md**
+3. **Sync src/ to .claude/:** Copy commands, hooks, and scripts
+   ```bash
+   cp src/commands/*.md .claude/commands/
+   cp src/hooks/*.sh .claude/hooks/
+   cp src/scripts/*.sh .claude/scripts/
+   chmod +x .claude/hooks/*.sh .claude/scripts/*.sh
+   ```
+4. **Update documentation** (README, user-manual, etc.)
+5. **Verify consistency** across all documentation files
+
 ---
 
 ## Session Context
