@@ -50,17 +50,15 @@ Claude Code sessions have limited context. When context fills up or you exit, va
 Download and run the setup script in your project directory:
 
 ```bash
-# Download the setup script
+# Download the setup script (using curl)
 curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/setup_memory_management.sh -o setup_memory_management.sh
 
-# Run it (installs to current directory)
+# Or using wget
+wget -q https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/setup_memory_management.sh
+
+# Run it
 bash setup_memory_management.sh .
-
-# Or install to a specific directory
-bash setup_memory_management.sh /path/to/your/project
 ```
-
-The script fetches all files from GitHub and requires either `curl` or `wget`.
 
 ### Manual Installation
 

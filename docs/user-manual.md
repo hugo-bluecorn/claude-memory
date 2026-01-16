@@ -365,16 +365,17 @@ CONTEXT_STALE: active-context.md is stale (last updated 48h ago). Consider runni
 ### Installation
 
 ```bash
-# Download the setup script
+# Download the setup script (using curl)
 curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/setup_memory_management.sh -o setup_memory_management.sh
+
+# Or using wget
+wget -q https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/setup_memory_management.sh
 
 # Run it in your project directory
 bash setup_memory_management.sh /path/to/your/project
 
 # Merge hook settings into your project's .claude/settings.json
 ```
-
-The script requires either `curl` or `wget` for downloading files.
 
 ### Daily Workflow
 
