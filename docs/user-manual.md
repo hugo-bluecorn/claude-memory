@@ -374,6 +374,8 @@ bash setup_memory_management.sh /path/to/your/project
 # Merge hook settings into your project's .claude/settings.json
 ```
 
+The script requires either `curl` or `wget` for downloading files.
+
 ### Daily Workflow
 
 ```
