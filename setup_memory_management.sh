@@ -16,7 +16,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # === Configuration ===
-GITHUB_RAW_BASE="https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main"
+GITHUB_RAW_BASE="https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/master"
 
 # Files to fetch
 REMOTE_COMMANDS=(
