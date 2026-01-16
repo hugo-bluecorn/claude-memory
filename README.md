@@ -60,6 +60,13 @@ wget -q https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/master/set
 bash setup_memory_management.sh .
 ```
 
+The script automatically:
+- Creates all directories and fetches all files
+- Configures `.claude/settings.json` with hooks
+- Adds session management to `.claude/CLAUDE.md`
+
+Start a new Claude Code session to activate the hooks.
+
 ### Manual Installation
 
 First clone the repository, then copy files to your project:

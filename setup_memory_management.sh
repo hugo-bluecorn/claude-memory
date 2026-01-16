@@ -47,9 +47,8 @@ This script installs:
   - Automatic backup hooks (session end, pre-compact, session start)
   - Helper scripts for session management
   - Template files for active-context.md and project-memory.md
-
-After installation, merge settings-hooks.json into your .claude/settings.json
-and add CLAUDE.md.snippet to your .claude/CLAUDE.md.
+  - Hook configuration in .claude/settings.json
+  - Session management section in .claude/CLAUDE.md
 EOF
   exit 0
 }
@@ -191,13 +190,84 @@ fetch_templates() {
   done
 }
 
+configure_settings() {
+  local target="$1"
+  local settings_file="$target/.claude/settings.json"
+  local temp_file
+  temp_file=$(mktemp)
+
+  echo "Configuring settings.json..."
+
+  # Fetch hooks config to temp file
+  fetch_remote_file "settings-hooks.json" "$temp_file" || return 1
+
+  if [[ ! -f "$settings_file" ]]; then
+    # No existing settings - just use the hooks file
+    cp "$temp_file" "$settings_file"
+  else
+    # Check if hooks already configured
+    if grep -q "PreCompact" "$settings_file" 2>/dev/null; then
+      echo -e "${YELLOW}  Skipping settings.json (hooks already configured)${NC}"
+      rm -f "$temp_file"
+      return 0
+    fi
+
+    # Merge hooks into existing settings using jq if available
+    if command -v jq &>/dev/null; then
+      local merged
+      merged=$(jq -s '.[0] * .[1]' "$settings_file" "$temp_file" 2>/dev/null)
+      if [[ -n "$merged" ]]; then
+        echo "$merged" > "$settings_file"
+      else
+        # jq merge failed, append hooks manually
+        echo -e "${YELLOW}  Warning: Could not merge settings, creating new file${NC}"
+        cp "$temp_file" "$settings_file"
+      fi
+    else
+      # No jq - just overwrite with hooks (user can merge manually if needed)
+      echo -e "${YELLOW}  Warning: jq not found, replacing settings.json${NC}"
+      cp "$temp_file" "$settings_file"
+    fi
+  fi
+
+  rm -f "$temp_file"
+}
+
+configure_claude_md() {
+  local target="$1"
+  local claude_md="$target/.claude/CLAUDE.md"
+  local temp_file
+  temp_file=$(mktemp)
+
+  echo "Configuring CLAUDE.md..."
+
+  # Fetch snippet to temp file
+  fetch_remote_file "CLAUDE.md.snippet" "$temp_file" || return 1
+
+  if [[ ! -f "$claude_md" ]]; then
+    # No existing CLAUDE.md - just use the snippet
+    cp "$temp_file" "$claude_md"
+  else
+    # Check if snippet already added
+    if grep -q "# Session Management" "$claude_md" 2>/dev/null; then
+      echo -e "${YELLOW}  Skipping CLAUDE.md (session management already configured)${NC}"
+      rm -f "$temp_file"
+      return 0
+    fi
+
+    # Append snippet to existing file
+    echo "" >> "$claude_md"
+    echo "---" >> "$claude_md"
+    echo "" >> "$claude_md"
+    cat "$temp_file" >> "$claude_md"
+  fi
+
+  rm -f "$temp_file"
+}
+
 show_success_message() {
   echo ""
   echo -e "${GREEN}Installation complete!${NC}"
-  echo ""
-  echo "Next steps:"
-  echo "1. Merge hooks from settings-hooks.json into your .claude/settings.json"
-  echo "2. Add session management section from CLAUDE.md.snippet to your .claude/CLAUDE.md"
   echo ""
   echo "Available commands:"
   echo "  /document-and-save     - Save session to default path"
@@ -206,6 +276,8 @@ show_success_message() {
   echo "  /resume-from           - Resume from specific session"
   echo "  /sessions-list         - Browse available sessions"
   echo "  /discard-backup        - Discard pending backup"
+  echo ""
+  echo "Start a new Claude Code session to activate the hooks."
 }
 
 # === Argument Parsing ===
@@ -242,6 +314,8 @@ main() {
   fetch_hooks "$TARGET_DIR" || exit 2
   fetch_scripts "$TARGET_DIR" || exit 2
   fetch_templates "$TARGET_DIR" || exit 2
+  configure_settings "$TARGET_DIR" || exit 2
+  configure_claude_md "$TARGET_DIR" || exit 2
 
   show_success_message
 }

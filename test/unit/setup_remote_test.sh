@@ -226,6 +226,7 @@ function test_handles_network_failure() {
   local exit_code=0
 
   export SETUP_FORCE_HTTP_CLIENT="curl"
+  export SETUP_TEST_MODE="mock_local"
   export MOCK_CURL_FAIL="1"
 
   bash "$SCRIPT_PATH" "$target" 2>/dev/null || exit_code=$?
@@ -239,6 +240,7 @@ function test_validates_empty_files() {
   local exit_code=0
 
   export SETUP_FORCE_HTTP_CLIENT="curl"
+  export SETUP_TEST_MODE="mock_local"
   export MOCK_CURL_EMPTY="1"
 
   bash "$SCRIPT_PATH" "$target" 2>/dev/null || exit_code=$?
@@ -263,6 +265,118 @@ function test_creates_directory_structure() {
   assert_directory_exists "$target/.claude/memory"
   assert_directory_exists "$target/.claude/memory/raw"
   assert_directory_exists "$target/.claude/memory/sessions"
+}
+
+# === Settings.json Tests ===
+
+function test_creates_settings_json_if_not_exists() {
+  # Should create .claude/settings.json with hooks if it doesn't exist
+  local target="$TEST_DIR/target"
+
+  export SETUP_FORCE_HTTP_CLIENT="curl"
+  export SETUP_TEST_MODE="mock_local"
+
+  bash "$SCRIPT_PATH" "$target"
+
+  assert_file_exists "$target/.claude/settings.json"
+
+  # Verify it contains hooks
+  local content
+  content=$(cat "$target/.claude/settings.json")
+  assert_contains "PreCompact" "$content"
+  assert_contains "SessionStart" "$content"
+  assert_contains "SessionEnd" "$content"
+}
+
+function test_merges_hooks_into_existing_settings() {
+  # Should merge hooks into existing settings.json without overwriting other settings
+  local target="$TEST_DIR/target"
+  mkdir -p "$target/.claude"
+  echo '{"other_setting": "value"}' > "$target/.claude/settings.json"
+
+  export SETUP_FORCE_HTTP_CLIENT="curl"
+  export SETUP_TEST_MODE="mock_local"
+
+  bash "$SCRIPT_PATH" "$target"
+
+  local content
+  content=$(cat "$target/.claude/settings.json")
+  # Should have both old settings and new hooks
+  assert_contains "other_setting" "$content"
+  assert_contains "PreCompact" "$content"
+}
+
+function test_does_not_duplicate_hooks() {
+  # Running setup twice should not duplicate hooks
+  local target="$TEST_DIR/target"
+
+  export SETUP_FORCE_HTTP_CLIENT="curl"
+  export SETUP_TEST_MODE="mock_local"
+
+  bash "$SCRIPT_PATH" "$target"
+  bash "$SCRIPT_PATH" "$target"
+
+  # Count occurrences of PreCompact - should be exactly 1
+  local count
+  count=$(grep -c "PreCompact" "$target/.claude/settings.json" || echo "0")
+  assert_equals "1" "$count"
+}
+
+# === CLAUDE.md Tests ===
+
+function test_creates_claude_md_if_not_exists() {
+  # Should create .claude/CLAUDE.md with snippet if it doesn't exist
+  local target="$TEST_DIR/target"
+
+  export SETUP_FORCE_HTTP_CLIENT="curl"
+  export SETUP_TEST_MODE="mock_local"
+
+  bash "$SCRIPT_PATH" "$target"
+
+  assert_file_exists "$target/.claude/CLAUDE.md"
+
+  # Verify it contains session management section
+  local content
+  content=$(cat "$target/.claude/CLAUDE.md")
+  assert_contains "Session Management" "$content"
+  assert_contains "@.claude/memory/active-context.md" "$content"
+}
+
+function test_appends_to_existing_claude_md() {
+  # Should append snippet to existing CLAUDE.md
+  local target="$TEST_DIR/target"
+  mkdir -p "$target/.claude"
+  echo "# My Project" > "$target/.claude/CLAUDE.md"
+  echo "" >> "$target/.claude/CLAUDE.md"
+  echo "Existing content here." >> "$target/.claude/CLAUDE.md"
+
+  export SETUP_FORCE_HTTP_CLIENT="curl"
+  export SETUP_TEST_MODE="mock_local"
+
+  bash "$SCRIPT_PATH" "$target"
+
+  local content
+  content=$(cat "$target/.claude/CLAUDE.md")
+  # Should have both old content and new snippet
+  assert_contains "My Project" "$content"
+  assert_contains "Existing content here" "$content"
+  assert_contains "Session Management" "$content"
+}
+
+function test_does_not_duplicate_snippet() {
+  # Running setup twice should not duplicate the snippet
+  local target="$TEST_DIR/target"
+
+  export SETUP_FORCE_HTTP_CLIENT="curl"
+  export SETUP_TEST_MODE="mock_local"
+
+  bash "$SCRIPT_PATH" "$target"
+  bash "$SCRIPT_PATH" "$target"
+
+  # Count occurrences of "# Session Management" - should be exactly 1
+  local count
+  count=$(grep -c "# Session Management" "$target/.claude/CLAUDE.md" || echo "0")
+  assert_equals "1" "$count"
 }
 
 # === Integration Tests ===

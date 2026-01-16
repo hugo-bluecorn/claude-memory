@@ -373,9 +373,10 @@ wget -q https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/master/set
 
 # Run it in your project directory
 bash setup_memory_management.sh /path/to/your/project
-
-# Merge hook settings into your project's .claude/settings.json
 ```
+
+The script automatically configures `.claude/settings.json` and `.claude/CLAUDE.md`.
+Start a new Claude Code session to activate the hooks.
 
 ### Daily Workflow
 
