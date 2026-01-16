@@ -13,6 +13,7 @@ Permanent knowledge about claude-memory that should persist across all sessions.
 - **File-based, single-instance**: All solutions must preserve this constraint
 - **Opt-in recovery**: User controls when to restore context (not automatic)
 - **Make compaction SAFE, not RARE**: Focus on reliable backups, not preventing compaction
+- **All Claude files in `.claude/`**: Memory lives at `.claude/memory/` to avoid conflicts with future Claude Code features
 
 ## Known Gotchas
 
