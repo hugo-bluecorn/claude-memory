@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Remote install**: `setup_memory_management.sh` now fetches files from GitHub
+  - Uses curl or wget (auto-detected)
+  - Downloads 12 commands, 3 hooks, 2 scripts, and 2 templates
+  - Validates downloaded files are non-empty
+  - Exit codes: 3 (no HTTP client), 2 (download failure), 1 (target not found)
 - `/fresh-start` command to clear session data and reset to clean state
   - Removes session documents, raw backups, and pending markers
   - Resets active-context.md to template

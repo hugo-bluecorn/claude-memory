@@ -145,3 +145,28 @@ function run_hook_with_env() {
   unset HOOK_PROJECT_DIR
   unset HOOK_SESSIONS_DIR
 }
+
+# === SETUP SCRIPT TEST HELPERS ===
+
+# Mock HTTP client for testing setup script
+# Sets SETUP_TEST_MODE="mock_local" to use local src/ files instead of remote fetch
+# Sets SETUP_FORCE_HTTP_CLIENT to simulate specific HTTP client availability
+#
+# Usage in test:
+#   export SETUP_FORCE_HTTP_CLIENT="curl"  # or "wget" or "none"
+#   export SETUP_TEST_MODE="mock_local"    # uses local files instead of network
+#
+# Error simulation:
+#   export MOCK_CURL_FAIL="1"    # simulate network failure
+#   export MOCK_CURL_EMPTY="1"   # simulate empty response
+
+function mock_http_client_from_local() {
+  export SETUP_TEST_MODE="mock_local"
+}
+
+# Force use of specific HTTP client for testing
+# @param client: "curl", "wget", or "none"
+function force_http_client() {
+  local client="$1"
+  export SETUP_FORCE_HTTP_CLIENT="$client"
+}

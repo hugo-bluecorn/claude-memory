@@ -45,11 +45,22 @@ Claude Code sessions have limited context. When context fills up or you exit, va
 
 ## Quick Start
 
-### Automatic Installation (Coming Soon)
+### Automatic Installation
+
+Download and run the setup script in your project directory:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/setup_memory_management.sh | bash
+# Download the setup script
+curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/setup_memory_management.sh -o setup_memory_management.sh
+
+# Run it (installs to current directory)
+bash setup_memory_management.sh .
+
+# Or install to a specific directory
+bash setup_memory_management.sh /path/to/your/project
 ```
+
+The script fetches all files from GitHub and requires either `curl` or `wget`.
 
 ### Manual Installation
 
@@ -130,6 +141,8 @@ curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/set
 | `/cleanup-backups` | Delete old backups to free space |
 | `/discard-backup` | Discard pending backup without processing |
 | `/context-stats` | View session management statistics |
+| `/fresh-start` | Clear session data, reset to clean state (keeps project-memory) |
+| `/fresh-start-all` | Full reset including project-memory |
 
 Use `--yes` flag with `/resume-latest` or `/resume-from` to skip confirmation prompts.
 
@@ -175,7 +188,8 @@ your-project/
     │   ├── on-session-end.sh
     │   └── on-pre-compact.sh
     ├── scripts/
-    │   └── discard-backup.sh
+    │   ├── discard-backup.sh
+    │   └── fresh-start.sh
     ├── memory/
     │   ├── active-context.md        # Current session state (auto-loaded)
     │   ├── project-memory.md        # Permanent knowledge (auto-loaded)

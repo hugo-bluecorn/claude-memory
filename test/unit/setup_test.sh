@@ -19,6 +19,10 @@ function set_up() {
 
   # Store original directory
   ORIGINAL_DIR=$(pwd)
+
+  # Enable mock mode for tests (uses local files instead of network)
+  export SETUP_FORCE_HTTP_CLIENT="curl"
+  export SETUP_TEST_MODE="mock_local"
 }
 
 function tear_down() {
@@ -27,6 +31,10 @@ function tear_down() {
     rm -rf "$TEST_DIR"
   fi
   cd "$ORIGINAL_DIR" 2>/dev/null || true
+
+  # Reset mock environment variables
+  unset SETUP_FORCE_HTTP_CLIENT
+  unset SETUP_TEST_MODE
 }
 
 # === Directory Creation Tests ===

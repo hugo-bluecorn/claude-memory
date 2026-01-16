@@ -58,6 +58,7 @@ Claude Memory solves a fundamental problem: Claude Code sessions are ephemeral. 
 │  │  /document-and-save  /resume-latest  /search-sessions │                   │
 │  │  /resume-from        /sessions-list  /cleanup-backups │                   │
 │  │  /discard-backup     /context-stats  /coalesce        │                   │
+│  │  /fresh-start        /fresh-start-all                 │                   │
 │  └──────────────────────────────────────────────────────┘                   │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -232,15 +233,18 @@ Claude Memory solves a fundamental problem: Claude Code sessions are ephemeral. 
 project/
 └── .claude/
     ├── commands/               # Slash commands
-    │   ├── document-and-save.md
-    │   ├── resume-latest.md
-    │   ├── resume-from.md
-    │   ├── coalesce.md
-    │   ├── sessions-list.md
-    │   ├── search-sessions.md
     │   ├── cleanup-backups.md
+    │   ├── coalesce.md
+    │   ├── context-stats.md
     │   ├── discard-backup.md
-    │   └── context-stats.md
+    │   ├── document-and-save.md
+    │   ├── document-and-save-to.md
+    │   ├── fresh-start.md
+    │   ├── fresh-start-all.md
+    │   ├── resume-from.md
+    │   ├── resume-latest.md
+    │   ├── search-sessions.md
+    │   └── sessions-list.md
     │
     ├── hooks/                  # Lifecycle hooks
     │   ├── on-session-start.sh
@@ -248,7 +252,8 @@ project/
     │   └── on-pre-compact.sh
     │
     ├── scripts/                # Utility scripts
-    │   └── discard-backup.sh
+    │   ├── discard-backup.sh
+    │   └── fresh-start.sh
     │
     ├── memory/                 # Session data
     │   ├── active-context.md   # Current state (auto-loaded)
@@ -309,6 +314,8 @@ project/
 | `/cleanup-backups` | Delete old backups | Freeing disk space |
 | `/discard-backup` | Delete pending backup | Skipping restoration |
 | `/context-stats` | View system statistics | Monitoring overhead |
+| `/fresh-start` | Reset session state | Starting fresh (keeps project-memory) |
+| `/fresh-start-all` | Full reset | Complete clean slate |
 
 ---
 
@@ -358,10 +365,11 @@ CONTEXT_STALE: active-context.md is stale (last updated 48h ago). Consider runni
 ### Installation
 
 ```bash
-# Clone and install
-git clone https://github.com/hugo-bluecorn/claude-memory.git
-cd claude-memory
-./setup_memory_management.sh /path/to/your/project
+# Download the setup script
+curl -sSL https://raw.githubusercontent.com/hugo-bluecorn/claude-memory/main/setup_memory_management.sh -o setup_memory_management.sh
+
+# Run it in your project directory
+bash setup_memory_management.sh /path/to/your/project
 
 # Merge hook settings into your project's .claude/settings.json
 ```
