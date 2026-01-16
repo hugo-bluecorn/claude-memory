@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `/fresh-start` command to clear session data and reset to clean state
+  - Removes session documents, raw backups, and pending markers
+  - Resets active-context.md to template
+  - Preserves project-memory.md by default
+- `/fresh-start-all` command for complete reset including project-memory
 - `/coalesce` command for merging delta work into last session document
 - "Last Session Doc" tracking in active-context.md for coalescing support
 - Coalesce detection in `/resume-latest` (offers merge option when compact backup + last session doc exist)
