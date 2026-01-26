@@ -64,7 +64,7 @@ Extract the session document date from its YAML frontmatter:
 grep "^date:" .claude/memory/[session-doc-name] | head -1
 ```
 
-Extract the backup timestamp from its filename (format: `YYYYMMDD_HHMMSS_compact.jsonl`).
+Extract the backup timestamp from its filename (format: `YYYYMMDD_HHMMSSZ_compact.jsonl` - note the Z suffix for UTC).
 
 If the backup is **older** than the session document, coalescing is **not appropriate**.
 Inform the user: "Backup is older than session document. Nothing to coalesce."
@@ -101,9 +101,9 @@ Create a "Session Continuation" section with this format:
 
 ---
 
-## Session Continuation (YYYY-MM-DD HH:MM)
+## Session Continuation (YYYY-MM-DDTHH:MMZ)
 
-> Coalesced from: raw/YYYYMMDD_HHMMSS_compact.jsonl
+> Coalesced from: raw/YYYYMMDD_HHMMSSZ_compact.jsonl
 
 ### Additional Work
 - [Work completed after the original save]
@@ -129,13 +129,13 @@ Append the "Session Continuation" section to the end of the session document.
 ### Step 5: Update Session Document Frontmatter
 
 Update the YAML frontmatter:
-- Update `date:` to the compaction timestamp
+- Update `date:` to the compaction timestamp (UTC with Z suffix)
 - Optionally update `status:` if work changed the state
 
 ### Step 6: Update active-context.md
 
 Update `.claude/memory/active-context.md`:
-1. Update `> Last Updated:` to current timestamp
+1. Update `> Last Updated:` to current UTC timestamp (YYYY-MM-DDTHH:MM:SSZ)
 2. Keep `> Last Session Doc:` pointing to same file (now updated)
 3. Update other sections to reflect the coalesced work
 4. Remove or update the `## Compaction` section

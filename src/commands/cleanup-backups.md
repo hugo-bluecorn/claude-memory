@@ -35,8 +35,9 @@ If no backups exist, inform the user and exit.
 ### 2. Parse Timestamps
 
 Extract timestamps from filenames. Backup files follow the pattern:
-- `YYYYMMDD_HHMMSS_<reason>.jsonl` (from SessionEnd)
-- `YYYYMMDD_HHMMSS_compact.jsonl` (from PreCompact)
+- `YYYYMMDD_HHMMSSZ_<reason>.jsonl` (from SessionEnd, UTC)
+- `YYYYMMDD_HHMMSSZ_compact.jsonl` (from PreCompact, UTC)
+- Legacy: `YYYYMMDD_HHMMSS_*.jsonl` (without Z suffix)
 
 ### 3. Apply Filters
 

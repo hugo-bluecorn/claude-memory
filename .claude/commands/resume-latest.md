@@ -57,16 +57,34 @@ Options:
 Choose option (1-3):
 ```
 
-**Option 1 Flow:**
+**Option 1 Flow (Token-Optimized Delta Extraction):**
+
 1. Load session document using `/resume-from` flow
-2. Perform lightweight delta check on JSONL:
-   - Count file edits (Write/Edit tool uses)
-   - Count substantive user messages (excluding commands)
-   - Check time delta between session doc and backup
-3. If delta is substantial (file edits > 0 OR time delta > 30min):
+
+2. Extract delta using timestamp filtering (minimizes token usage):
+   ```bash
+   # Get session doc timestamp from YAML frontmatter
+   SESSION_TIME=$(grep "^date:" .claude/memory/sessions/[session-doc] | sed 's/date: //')
+
+   # Filter JSONL to only records AFTER session doc (done in bash, not loaded into context)
+   jq -c "select(.timestamp > \"$SESSION_TIME\")" [backup-path] > /tmp/delta.jsonl
+
+   # Check delta size
+   DELTA_LINES=$(wc -l < /tmp/delta.jsonl)
+   ```
+
+3. Analyze delta (only read the small filtered file):
+   - If `DELTA_LINES` is 0: "No additional work found after session doc"
+   - If delta exists, read `/tmp/delta.jsonl` and extract:
+     - File edits (Write/Edit tool uses)
+     - Key decisions made
+     - Any errors encountered
+
+4. If delta is substantial:
    - Present: "Since your last save, you also: [brief delta summary]"
    - Ask: "Add this to your context? [Y/n]"
-4. Clean up backup marker (and optionally backup file)
+
+5. Clean up: Delete backup marker, optionally archive backup file
 
 **Option 2 Flow:**
 1. Load session document using `/resume-from` flow
@@ -85,7 +103,7 @@ If no linked session document exists, OR user chose option 3:
 - Parse the JSONL conversation history (see JSONL Format Reference below)
 - Generate a high-quality summary following the Extraction Strategy
 - Update `.claude/memory/active-context.md` with the summary
-- Optionally create a session document: `.claude/memory/sessions/session-YYYY-MM-DD-HHMM.md`
+- Optionally create a session document: `.claude/memory/sessions/session-YYYY-MM-DD-HHMMZ.md`
 - Delete the processed marker file(s)
 - Continue to step 3 (skip steps 1-2 since we just processed the latest)
 
@@ -99,7 +117,7 @@ Compare timestamps from two sources:
 
 **A. Session Documents:**
 - Look in `.claude/memory/` directory
-- Find all `.md` files matching the pattern `session-YYYY-MM-DD-HHMM.md`
+- Find all `.md` files matching the pattern `session-YYYY-MM-DD-HHMMZ.md`
 - Sort by the date/time in the filename (newest first)
 
 **B. Raw Transcripts (if no session documents or transcripts are newer):**
@@ -148,7 +166,7 @@ Follow all steps from the `/resume-from` command:
 3. Apply the Extraction Strategy to identify key information
 4. Generate a high-quality summary following the session document format
 5. Update `.claude/memory/active-context.md` with condensed summary
-6. Optionally save full summary to `.claude/memory/sessions/session-YYYY-MM-DD-HHMM.md`
+6. Optionally save full summary to `.claude/memory/sessions/session-YYYY-MM-DD-HHMMZ.md`
 7. Present summary and next steps to user
 
 See `/resume-from` for detailed instructions on each step.

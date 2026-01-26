@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **UTC timestamps with Z suffix** across all files for consistent timezone handling
+  - Session filenames: `session-YYYY-MM-DD-HHMMZ.md`
+  - YAML frontmatter: `date: YYYY-MM-DDTHH:MMZ`
+  - active-context.md: `> Last Updated: YYYY-MM-DDTHH:MM:SSZ`
+  - Backup filenames: `YYYYMMDD_HHMMSSZ_*.jsonl`
+  - Direct comparison with JSONL record timestamps (already UTC)
+- **Token-optimized delta filtering** in `/resume-latest` Option 1 flow
+  - Uses jq to filter JSONL by timestamp before loading into context
+  - Only loads records created after session document timestamp
+  - Significantly reduces token usage for delta extraction
+- Backward compatibility: hooks parse both old and new timestamp formats
 - **Enhanced extraction strategy** with 8 additional context categories:
   - Environment & Configuration, Code Understanding, User Preferences
   - Test Status, Technical Debt, Warnings & Gotchas, References Used

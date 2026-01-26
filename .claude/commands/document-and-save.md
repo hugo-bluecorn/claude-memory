@@ -31,16 +31,16 @@ Continue with documentation (don't block).
 This is the most critical step - do this BEFORE writing the full session document.
 Write condensed context immediately:
 
-**IMPORTANT**: Always update the `> Last Updated:` timestamp to the current time (YYYY-MM-DD HH:MM:SS format).
-This enables staleness detection - SessionStart will warn if context is >24h old.
+**IMPORTANT**: Always update the `> Last Updated:` timestamp to the current UTC time with Z suffix (YYYY-MM-DDTHH:MM:SSZ).
+This enables staleness detection and allows direct comparison with JSONL backup timestamps.
 
 **NOTE**: The `> Last Session Doc:` field will be set in Step 2 after creating the session document.
 This enables session coalescing - merging delta work done after this save but before compaction.
 
 ```markdown
 # Active Session Context
-> Last Updated: YYYY-MM-DD HH:MM:SS
-> Last Session Doc: session-YYYY-MM-DD-HHMM.md
+> Last Updated: YYYY-MM-DDTHH:MM:SSZ
+> Last Session Doc: session-YYYY-MM-DD-HHMMZ.md
 
 ## Current Task
 [From Next Steps - what to work on next]
@@ -66,7 +66,7 @@ This enables session coalescing - merging delta work done after this save but be
 
 ## Step 2: Create Full Session Document
 
-Create a comprehensive session document in `.claude/memory/sessions/session-YYYY-MM-DD-HHMM.md` with:
+Create a comprehensive session document in `.claude/memory/sessions/session-YYYY-MM-DD-HHMMZ.md` (UTC time with Z suffix):
 
 ### Auto-detect Previous Session
 
@@ -76,14 +76,14 @@ Before creating the document, find the most recent existing session:
 ls -t .claude/memory/sessions/session-*.md 2>/dev/null | head -1
 ```
 
-If a previous session exists, set `previous_session` to its relative path (e.g., `session-2026-01-14-1430.md`).
+If a previous session exists, set `previous_session` to its relative path (e.g., `session-2026-01-14-1430Z.md`).
 This creates a chain of sessions that can be followed for full project history.
 
 ### YAML Frontmatter
 
    ```yaml
    ---
-   date: YYYY-MM-DD HH:MM
+   date: YYYY-MM-DDTHH:MMZ
    project: <infer from cwd name or package.json>
    status: completed | in-progress | blocked
    tags: [relevant, keywords, for, this, session]

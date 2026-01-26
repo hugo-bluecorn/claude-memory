@@ -31,7 +31,7 @@ fi
 log_debug() {
   local msg="$1"
   if [[ "${HOOK_DEBUG:-false}" == "true" ]]; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $msg" >> "$SESSIONS_DIR/.debug-log"
+    echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] $msg" >> "$SESSIONS_DIR/.debug-log"
   fi
 }
 
@@ -72,7 +72,7 @@ create_backup() {
   local transcript="$1"
   local reason="$2"
   local timestamp
-  timestamp=$(date +%Y%m%d_%H%M%S)
+  timestamp=$(date -u +%Y%m%d_%H%M%SZ)
 
   # Ensure raw directory exists
   mkdir -p "$SESSIONS_DIR/raw"
@@ -102,7 +102,7 @@ create_pending_marker() {
 update_backup_log() {
   local reason="$1"
   local backup_path="$2"
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] SessionEnd ($reason): Saved backup to $backup_path" >> "$SESSIONS_DIR/.backup-log"
+  echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] SessionEnd ($reason): Saved backup to $backup_path" >> "$SESSIONS_DIR/.backup-log"
   log_debug "Updated backup log"
 }
 
@@ -131,7 +131,7 @@ update_active_context() {
   mv "$temp_file" "$active_context"
 
   # Add exit info
-  echo "- Last exit: $(date '+%Y-%m-%d %H:%M:%S') (reason: $reason)" >> "$active_context"
+  echo "- Last exit: $(date -u '+%Y-%m-%dT%H:%M:%SZ') (reason: $reason)" >> "$active_context"
   echo "- Transcript backup: $backup_path" >> "$active_context"
 
   log_debug "Updated active-context.md"
