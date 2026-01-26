@@ -265,7 +265,25 @@ configure_claude_md() {
   rm -f "$temp_file"
 }
 
+check_legacy_files() {
+  local target="$1"
+  local has_legacy=false
+
+  # Check for old session format (without Z suffix)
+  if ls "$target/.claude/memory/sessions/"session-????-??-??-????.md 2>/dev/null | grep -qv 'Z\.md$'; then
+    has_legacy=true
+  fi
+
+  # Check for old backup format (without Z suffix)
+  if ls "$target/.claude/memory/raw/"*.jsonl 2>/dev/null | grep -qvE '[0-9]{8}_[0-9]{6}Z_'; then
+    has_legacy=true
+  fi
+
+  echo "$has_legacy"
+}
+
 show_success_message() {
+  local target="$1"
   echo ""
   echo -e "${GREEN}Installation complete!${NC}"
   echo ""
@@ -277,6 +295,15 @@ show_success_message() {
   echo "  /sessions-list         - Browse available sessions"
   echo "  /discard-backup        - Discard pending backup"
   echo ""
+
+  # Check for legacy files and warn
+  if [[ "$(check_legacy_files "$target")" == "true" ]]; then
+    echo -e "${YELLOW}Warning: Legacy session files detected.${NC}"
+    echo "Timestamps now use UTC with Z suffix. To clear old data:"
+    echo "  Run /fresh-start in your next Claude Code session"
+    echo ""
+  fi
+
   echo "Start a new Claude Code session to activate the hooks."
 }
 
@@ -317,7 +344,7 @@ main() {
   configure_settings "$TARGET_DIR" || exit 2
   configure_claude_md "$TARGET_DIR" || exit 2
 
-  show_success_message
+  show_success_message "$TARGET_DIR"
 }
 
 main "$@"

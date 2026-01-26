@@ -67,6 +67,25 @@ The script automatically:
 
 Start a new Claude Code session to activate the hooks.
 
+### Upgrading from Previous Versions
+
+If you have an existing installation, re-run the setup script to update:
+
+```bash
+bash setup_memory_management.sh .
+```
+
+**Breaking Change (v0.2.0+):** All timestamps now use UTC with Z suffix. After upgrading:
+
+1. Run `/fresh-start` to clear old session data with incompatible timestamp formats
+2. Or manually delete old files:
+   ```bash
+   rm -rf .claude/memory/sessions/session-*.md
+   rm -rf .claude/memory/raw/*.jsonl
+   ```
+
+The `active-context.md` and `project-memory.md` files are preserved. Update the `> Last Updated:` line in `active-context.md` to use the new format: `> Last Updated: YYYY-MM-DDTHH:MM:SSZ`
+
 ### Manual Installation
 
 First clone the repository, then copy files to your project:

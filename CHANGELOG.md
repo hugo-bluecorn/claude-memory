@@ -64,6 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Windows CMD/PowerShell doesn't expand `$VARIABLE` syntax
   - `bash "$CLAUDE_PROJECT_DIR/..."` ensures bash handles variable expansion
   - Fixed in `settings-hooks.json` for setup script installations
+- **Setup script**: Now detects legacy timestamp files and warns users to run `/fresh-start`
 
 ### Removed
 - **BREAKING**: Legacy timestamp format support removed
