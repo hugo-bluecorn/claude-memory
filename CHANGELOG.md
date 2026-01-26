@@ -63,6 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Windows compatibility**: Hook commands now use `bash` prefix for cross-platform support
   - Windows CMD/PowerShell doesn't expand `$VARIABLE` syntax
   - `bash "$CLAUDE_PROJECT_DIR/..."` ensures bash handles variable expansion
+  - Fixed in `settings-hooks.json` for setup script installations
 
 ### Removed
 - **BREAKING**: Legacy timestamp format support removed
