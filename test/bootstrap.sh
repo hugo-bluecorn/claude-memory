@@ -86,11 +86,12 @@ function assert_backup_created() {
 }
 
 # Assert that the pending backup marker exists with correct content
-# Usage: assert_pending_marker_exists "$test_dir" "expected_path"
+# Usage: assert_pending_marker_exists "$test_dir" "expected_path" ["exit"|"compact"]
 function assert_pending_marker_exists() {
   local test_dir="$1"
   local expected_path="${2:-}"
-  local marker="$test_dir/.claude/memory/.pending-backup"
+  local marker_type="${3:-exit}"
+  local marker="$test_dir/.claude/memory/.pending-backup-${marker_type}"
 
   assert_file_exists "$marker"
 

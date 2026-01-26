@@ -39,22 +39,16 @@ No instruction to Claude on how to determine if it's a continuation.
 
 ---
 
-#### Problem 2: Backup Marker Overwrite Risk
-**Location**: `src/hooks/on-pre-compact.sh` line 48, `src/hooks/on-session-end.sh` line 96
+#### Problem 2: Backup Marker Overwrite Risk ✅ RESOLVED
+**Location**: `src/hooks/on-pre-compact.sh`, `src/hooks/on-session-end.sh`
 
-**Issue**: Both hooks write to the same `.pending-backup` marker file. If PreCompact fires at 90% context, then user exits before running /resume-latest, SessionEnd overwrites the marker with its backup path. The PreCompact backup reference is lost.
+**Issue**: Both hooks originally wrote to the same marker file, causing overwrites.
 
-**Impact**: Critical context from pre-compaction conversation could be lost.
+**Resolution**: Each hook now uses its own marker file:
+- PreCompact → `.pending-backup-compact`
+- SessionEnd → `.pending-backup-exit`
 
-**Evidence**:
-```bash
-# on-pre-compact.sh:48
-echo "$BACKUP_PATH" > "$SESSIONS_DIR/.pending-backup"
-
-# on-session-end.sh:96
-echo "$backup_path" > "$SESSIONS_DIR/.pending-backup"
-```
-Same marker file, no conflict detection.
+Both markers are processed independently by `/resume-latest`.
 
 ---
 

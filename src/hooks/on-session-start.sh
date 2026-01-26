@@ -6,10 +6,9 @@
 #   0 = success (always - SessionStart cannot block, exit 2 only shows stderr to user)
 # Note: stdout is added as context for Claude, enabling awareness of pending backups
 #
-# Supports multiple marker types:
+# Supports marker types:
 #   .pending-backup-compact - Created by PreCompact hook
 #   .pending-backup-exit - Created by SessionEnd hook
-#   .pending-backup - Legacy marker (for backward compatibility)
 
 set -euo pipefail
 
@@ -150,10 +149,9 @@ check_staleness
 # Check for context file overhead
 check_overhead
 
-# Check for all marker types
+# Check for marker types
 process_marker "$SESSIONS_DIR/.pending-backup-compact" "compact"
 process_marker "$SESSIONS_DIR/.pending-backup-exit" "exit"
-process_marker "$SESSIONS_DIR/.pending-backup" "legacy"
 
 # If any pending backups were found, output instructions
 if [[ "$found_pending" == "true" ]]; then

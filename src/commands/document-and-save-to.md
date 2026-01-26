@@ -15,9 +15,10 @@ Please follow these steps. Wrap all output at 120 characters maximum.
 Check for pending backup:
 
 1. If your SessionStart context includes `SESSION_BACKUP_PENDING`, note the backup path.
-2. Otherwise, check the marker file:
+2. Otherwise, check the marker files:
    ```bash
-   cat .claude/memory/.pending-backup 2>/dev/null
+   cat .claude/memory/.pending-backup-exit 2>/dev/null
+   cat .claude/memory/.pending-backup-compact 2>/dev/null
    ```
 
 If a pending backup exists, inform the user:

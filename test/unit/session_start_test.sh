@@ -42,64 +42,8 @@ function test_session_start_silent_when_no_pending() {
 
 # === Pending Backup Detection Tests ===
 
-function test_session_start_outputs_context_with_pending_backup() {
-  # When pending backup exists and backup file exists, hook should exit 0
-  # and output notification message to stdout (for Claude context)
-  # Note: SessionStart hooks cannot block (exit 2 only shows stderr to user)
-  local backup_file="$HOOK_SESSIONS_DIR/raw/test_backup.jsonl"
-  mkdir -p "$(dirname "$backup_file")"
-  create_test_transcript "$backup_file"
-
-  # Create pending marker pointing to backup
-  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup"
-
-  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
-
-  local stdout_output
-  local exit_code=0
-
-  stdout_output=$(echo "$json" | bash "$HOOK_PATH" 2>/dev/null) || exit_code=$?
-
-  # Exit code 0 - success with context output
-  assert_equals "0" "$exit_code"
-  # Message should include backup path and instructions (output to stdout for Claude)
-  assert_contains "SESSION_BACKUP_PENDING" "$stdout_output"
-  assert_contains "resume-latest" "$stdout_output"
-  assert_contains "discard-backup" "$stdout_output"
-}
-
-function test_session_start_preserves_marker_after_notification() {
-  # Marker should be preserved after notification so /resume-latest can use it
-  local backup_file="$HOOK_SESSIONS_DIR/raw/20251209_120000_test.jsonl"
-  mkdir -p "$(dirname "$backup_file")"
-  create_test_transcript "$backup_file"
-
-  # Create pending marker pointing to backup
-  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup"
-
-  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
-
-  # Run hook
-  echo "$json" | bash "$HOOK_PATH" 2>&1
-
-  # Marker should still exist with correct path
-  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup"
-  local marker_content
-  marker_content=$(cat "$HOOK_SESSIONS_DIR/.pending-backup")
-  assert_contains "20251209_120000_test.jsonl" "$marker_content"
-}
-
-function test_session_start_cleans_stale_marker() {
-  # When marker exists but backup file doesn't, marker should be cleaned
-  echo "/nonexistent/backup.jsonl" > "$HOOK_SESSIONS_DIR/.pending-backup"
-
-  local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
-
-  echo "$json" | bash "$HOOK_PATH" 2>&1
-
-  # Marker should be removed
-  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup"
-}
+# Legacy marker tests removed - system now only uses .pending-backup-exit and .pending-backup-compact
+# See test_session_start_detects_exit_marker and test_session_start_detects_compact_marker below
 
 # === Edge Case Tests: Input Validation ===
 
@@ -128,7 +72,7 @@ function test_session_start_handles_empty_json_object() {
 
 function test_session_start_handles_empty_marker_file() {
   # Empty marker file should be handled gracefully
-  touch "$HOOK_SESSIONS_DIR/.pending-backup"
+  touch "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 
   local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
   local exit_code=0
@@ -137,7 +81,7 @@ function test_session_start_handles_empty_marker_file() {
 
   assert_equals "0" "$exit_code"
   # Empty marker should be cleaned
-  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup"
+  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 }
 
 function test_session_start_handles_marker_with_whitespace() {
@@ -147,7 +91,7 @@ function test_session_start_handles_marker_with_whitespace() {
   create_test_transcript "$backup_file"
 
   # Create marker with extra whitespace
-  echo "   $backup_file   " > "$HOOK_SESSIONS_DIR/.pending-backup"
+  echo "   $backup_file   " > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 
   local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
   local exit_code=0
@@ -189,7 +133,7 @@ function test_session_start_handles_path_with_spaces_in_marker() {
   mkdir -p "$(dirname "$backup_file")"
   create_test_transcript "$backup_file"
 
-  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup"
+  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 
   local json='{"session_id":"test-123","transcript_path":"/path/to/transcript","source":"resume"}'
   local exit_code=0
@@ -200,7 +144,7 @@ function test_session_start_handles_path_with_spaces_in_marker() {
   assert_equals "0" "$exit_code"
   assert_contains "resume-latest" "$stdout_output"
   # Marker should be preserved
-  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup"
+  assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 }
 
 function test_session_start_handles_missing_sessions_directory() {

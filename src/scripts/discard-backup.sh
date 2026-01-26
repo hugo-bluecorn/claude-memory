@@ -3,10 +3,9 @@
 # Purpose: Discard pending session backup(s) without restoring
 # Usage: Called via /discard-backup slash command
 #
-# Handles multiple marker types:
+# Handles marker types:
 #   .pending-backup-compact - Created by PreCompact hook
 #   .pending-backup-exit - Created by SessionEnd hook
-#   .pending-backup - Legacy marker (for backward compatibility)
 
 set -euo pipefail
 
@@ -66,16 +65,12 @@ discard_marker() {
 
 found_any=false
 
-# Process all marker types
+# Process marker types
 if discard_marker "$SESSIONS_DIR/.pending-backup-compact" "compact"; then
   found_any=true
 fi
 
 if discard_marker "$SESSIONS_DIR/.pending-backup-exit" "exit"; then
-  found_any=true
-fi
-
-if discard_marker "$SESSIONS_DIR/.pending-backup" "legacy"; then
   found_any=true
 fi
 

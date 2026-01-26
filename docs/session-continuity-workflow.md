@@ -62,7 +62,8 @@ These files are imported into every session via `@` syntax in CLAUDE.md:
 | File | Purpose |
 |------|---------|
 | `raw/*.jsonl` | Raw conversation transcripts |
-| `.pending-backup` | Marker containing path to unprocessed backup |
+| `.pending-backup-exit` | Marker from SessionEnd hook |
+| `.pending-backup-compact` | Marker from PreCompact hook |
 
 ---
 
@@ -75,7 +76,7 @@ All hooks are bash scripts in `.claude/hooks/`. They are triggered automatically
 **Trigger**: Session starts (startup, resume, clear, compact)
 
 **Behavior**:
-- Checks for `.pending-backup` marker
+- Checks for `.pending-backup-exit` and `.pending-backup-compact` markers
 - If exists and backup file is valid, outputs to stdout:
   ```
   SESSION_BACKUP_PENDING: A previous session backup exists at [path]
@@ -94,7 +95,7 @@ All hooks are bash scripts in `.claude/hooks/`. They are triggered automatically
 - Reads JSON input: `{"session_id", "transcript_path", "stop_reason"}`
 - If transcript exists and is non-empty:
   - Copies to `raw/YYYYMMDD_HHMMSS_<reason>.jsonl`
-  - Creates `.pending-backup` marker with backup path
+  - Creates `.pending-backup-exit` marker with backup path
   - Updates `active-context.md` with exit timestamp
   - Logs event to `.backup-log`
 
@@ -105,8 +106,8 @@ All hooks are bash scripts in `.claude/hooks/`. They are triggered automatically
 **Behavior**:
 - Reads JSON input: `{"transcript_path", "trigger", "session_id"}`
 - If transcript exists and is non-empty:
-  - Copies to `raw/YYYYMMDD_HHMMSS.jsonl`
-  - Creates `.pending-backup` marker
+  - Copies to `raw/YYYYMMDD_HHMMSS_compact.jsonl`
+  - Creates `.pending-backup-compact` marker
   - Logs event to `.backup-log`
 
 ---
@@ -134,7 +135,7 @@ Same as `/document-and-save` but to specified path.
 Process pending backup or load most recent session.
 
 **Steps**:
-1. Check for `SESSION_BACKUP_PENDING` in context or `.pending-backup` marker
+1. Check for `SESSION_BACKUP_PENDING` in context or pending backup markers
 2. If pending backup exists:
    - Read and parse JSONL transcript
    - Generate high-quality summary
@@ -210,7 +211,7 @@ PreCompact hook fires
        │
        ▼
 Raw transcript saved to sessions/raw/
-.pending-backup marker created
+.pending-backup-compact marker created
        │
        ▼
 Compaction happens (system summarizes context)
@@ -226,7 +227,7 @@ User runs /resume-latest to process backup
        │
        ▼
 Claude parses JSONL, updates active-context.md
-Deletes .pending-backup marker
+Deletes pending backup marker
 ```
 
 ### Flow C: Session Exit (Safety Net)
@@ -239,7 +240,7 @@ SessionEnd hook fires
        │
        ▼
 Raw transcript saved to sessions/raw/
-.pending-backup marker created
+.pending-backup-exit marker created
 active-context.md updated with exit timestamp
 
 ═══════════════ NEW SESSION ═══════════════

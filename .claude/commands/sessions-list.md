@@ -10,9 +10,10 @@ Please follow these steps. Wrap all output at 120 characters maximum.
 
 If your SessionStart context includes `SESSION_BACKUP_PENDING`, extract the backup path from that message.
 
-Otherwise, check the marker file:
+Otherwise, check the marker files:
 ```bash
-cat .claude/memory/.pending-backup 2>/dev/null
+cat .claude/memory/.pending-backup-exit 2>/dev/null
+cat .claude/memory/.pending-backup-compact 2>/dev/null
 ```
 
 If a pending backup exists, display it prominently before the session list:

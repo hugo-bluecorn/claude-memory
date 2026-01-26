@@ -8,20 +8,17 @@
 
 ## Phase 1: Critical Fixes (Do First)
 
-### 1.1 Fix Backup Marker Conflict
-**Problem**: PreCompact and SessionEnd both write to `.pending-backup`, causing overwrites.
+### 1.1 Fix Backup Marker Conflict ✅ COMPLETED
+**Problem**: PreCompact and SessionEnd originally wrote to the same marker file, causing overwrites.
 
-**Files to modify**:
-- `src/hooks/on-pre-compact.sh` → write to `.pending-backup-compact`
-- `src/hooks/on-session-end.sh` → write to `.pending-backup-exit`
-- `src/hooks/on-session-start.sh` → check all `.pending-backup-*` files
-- `src/commands/resume-latest.md` → process multiple pending backups
-- `src/scripts/discard-backup.sh` → handle multiple markers
+**Resolution**: Each hook now uses its own marker file:
+- `src/hooks/on-pre-compact.sh` → writes to `.pending-backup-compact`
+- `src/hooks/on-session-end.sh` → writes to `.pending-backup-exit`
+- `src/hooks/on-session-start.sh` → checks both marker files
+- `src/commands/resume-latest.md` → processes multiple pending backups
+- `src/scripts/discard-backup.sh` → handles multiple markers
 
-**Tests to update**:
-- `test/unit/pre_compact_test.sh`
-- `test/unit/session_end_test.sh`
-- `test/unit/session_start_test.sh`
+All tests updated and passing.
 - `test/unit/discard_backup_test.sh`
 
 **Implementation**:

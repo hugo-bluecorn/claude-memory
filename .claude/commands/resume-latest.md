@@ -20,17 +20,15 @@ Please follow these steps. Wrap all output at 120 characters maximum.
 |-------------|------------|------|
 | `.pending-backup-compact` | PreCompact hook | Context auto-compaction |
 | `.pending-backup-exit` | SessionEnd hook | Session exit (/exit, logout) |
-| `.pending-backup` | Legacy | Backward compatibility |
 
 **Detection methods:**
 
 1. If your SessionStart context includes `SESSION_BACKUP_PENDING`, extract the backup path(s) and type(s) directly.
 2. Otherwise, check for markers:
    ```bash
-   # Check all marker types (newest is usually most relevant)
+   # Check marker types (newest is usually most relevant)
    cat .claude/memory/.pending-backup-exit 2>/dev/null
    cat .claude/memory/.pending-backup-compact 2>/dev/null
-   cat .claude/memory/.pending-backup 2>/dev/null
    ```
 
 **If pending backup(s) exist:**

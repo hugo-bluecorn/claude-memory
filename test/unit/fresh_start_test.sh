@@ -61,13 +61,11 @@ function test_fresh_start_removes_pending_markers() {
   # Create all marker types
   echo "/path/to/backup1.jsonl" > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
   echo "/path/to/backup2.jsonl" > "$HOOK_SESSIONS_DIR/.pending-backup-compact"
-  echo "/path/to/backup3.jsonl" > "$HOOK_SESSIONS_DIR/.pending-backup"
 
   bash "$SCRIPT_PATH" 2>&1
 
   assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
   assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup-compact"
-  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup"
 }
 
 function test_fresh_start_resets_active_context() {

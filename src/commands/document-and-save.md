@@ -17,7 +17,6 @@ Check for pending backups (there may be multiple):
    ```bash
    cat .claude/memory/.pending-backup-exit 2>/dev/null
    cat .claude/memory/.pending-backup-compact 2>/dev/null
-   cat .claude/memory/.pending-backup 2>/dev/null
    ```
 
 If a pending backup exists, inform the user:

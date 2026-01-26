@@ -22,7 +22,6 @@ Please follow these steps. Wrap all output at 120 characters maximum.
    ```bash
    cat .claude/memory/.pending-backup-exit 2>/dev/null
    cat .claude/memory/.pending-backup-compact 2>/dev/null
-   cat .claude/memory/.pending-backup 2>/dev/null
    ```
 
 If a pending backup exists:

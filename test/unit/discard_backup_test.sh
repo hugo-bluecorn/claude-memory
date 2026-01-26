@@ -31,7 +31,7 @@ function test_discard_removes_backup_file() {
   local backup_file="$HOOK_SESSIONS_DIR/raw/test_backup.jsonl"
   mkdir -p "$(dirname "$backup_file")"
   create_test_transcript "$backup_file"
-  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup"
+  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 
   bash "$SCRIPT_PATH" 2>&1
 
@@ -43,11 +43,11 @@ function test_discard_removes_marker() {
   local backup_file="$HOOK_SESSIONS_DIR/raw/test_backup.jsonl"
   mkdir -p "$(dirname "$backup_file")"
   create_test_transcript "$backup_file"
-  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup"
+  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 
   bash "$SCRIPT_PATH" 2>&1
 
-  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup"
+  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 }
 
 function test_discard_returns_success() {
@@ -55,7 +55,7 @@ function test_discard_returns_success() {
   local backup_file="$HOOK_SESSIONS_DIR/raw/test_backup.jsonl"
   mkdir -p "$(dirname "$backup_file")"
   create_test_transcript "$backup_file"
-  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup"
+  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 
   local exit_code=0
   bash "$SCRIPT_PATH" 2>&1 || exit_code=$?
@@ -68,7 +68,7 @@ function test_discard_outputs_confirmation() {
   local backup_file="$HOOK_SESSIONS_DIR/raw/test_backup.jsonl"
   mkdir -p "$(dirname "$backup_file")"
   create_test_transcript "$backup_file"
-  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup"
+  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 
   local output
   output=$(bash "$SCRIPT_PATH" 2>&1)
@@ -91,7 +91,7 @@ function test_discard_handles_no_marker() {
 
 function test_discard_handles_empty_marker() {
   # When marker exists but is empty, should clean up and report
-  touch "$HOOK_SESSIONS_DIR/.pending-backup"
+  touch "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 
   local output
   local exit_code=0
@@ -99,12 +99,12 @@ function test_discard_handles_empty_marker() {
   output=$(bash "$SCRIPT_PATH" 2>&1) || exit_code=$?
 
   assert_equals "0" "$exit_code"
-  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup"
+  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 }
 
 function test_discard_handles_stale_marker() {
   # When marker points to non-existent file, should clean marker
-  echo "/nonexistent/backup.jsonl" > "$HOOK_SESSIONS_DIR/.pending-backup"
+  echo "/nonexistent/backup.jsonl" > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 
   local output
   local exit_code=0
@@ -112,7 +112,7 @@ function test_discard_handles_stale_marker() {
   output=$(bash "$SCRIPT_PATH" 2>&1) || exit_code=$?
 
   assert_equals "0" "$exit_code"
-  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup"
+  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 }
 
 # === Edge Cases ===
@@ -122,12 +122,12 @@ function test_discard_handles_path_with_spaces() {
   local backup_file="$HOOK_SESSIONS_DIR/raw/path with spaces/backup.jsonl"
   mkdir -p "$(dirname "$backup_file")"
   create_test_transcript "$backup_file"
-  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup"
+  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 
   bash "$SCRIPT_PATH" 2>&1
 
   assert_file_not_exists "$backup_file"
-  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup"
+  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 }
 
 function test_discard_handles_missing_sessions_dir() {
@@ -147,7 +147,7 @@ function test_discard_preserves_other_backups() {
   mkdir -p "$(dirname "$backup_file")"
   create_test_transcript "$backup_file"
   create_test_transcript "$other_backup"
-  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup"
+  echo "$backup_file" > "$HOOK_SESSIONS_DIR/.pending-backup-exit"
 
   bash "$SCRIPT_PATH" 2>&1
 

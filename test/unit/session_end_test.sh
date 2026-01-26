@@ -461,7 +461,7 @@ function test_session_end_multiple_runs_create_separate_backups() {
 # These tests enforce the new marker naming convention to prevent overwrites
 
 function test_session_end_creates_exit_marker() {
-  # SessionEnd should use .pending-backup-exit (not .pending-backup)
+  # SessionEnd should use .pending-backup-exit
   # This prevents overwrites when PreCompact also runs
   local transcript_file="$TEST_DIR/transcript.jsonl"
   create_test_transcript "$transcript_file"
@@ -470,11 +470,8 @@ function test_session_end_creates_exit_marker() {
   json=$(mock_hook_input "$transcript_file" "prompt_input_exit" "session-123")
   echo "$json" | bash "$HOOK_PATH" 2>&1
 
-  # New marker should exist
+  # Exit marker should exist
   assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-exit"
-
-  # Old marker should NOT exist (breaking change)
-  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup"
 
   # Marker should contain backup path
   local marker_content

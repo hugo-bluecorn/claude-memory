@@ -41,12 +41,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **BREAKING**: Backup marker conflict between PreCompact and SessionEnd hooks
   - PreCompact now uses `.pending-backup-compact`
   - SessionEnd now uses `.pending-backup-exit`
-  - Legacy `.pending-backup` still supported for backward compatibility
 - PreCompact hook now skips empty transcript files (parity with SessionEnd)
 - PreCompact hook validation and error handling improved
 - **Windows compatibility**: Hook commands now use `bash` prefix for cross-platform support
   - Windows CMD/PowerShell doesn't expand `$VARIABLE` syntax
   - `bash "$CLAUDE_PROJECT_DIR/..."` ensures bash handles variable expansion
+
+### Removed
+- **BREAKING**: Legacy `.pending-backup` marker support removed
+  - System now exclusively uses `.pending-backup-exit` and `.pending-backup-compact`
+  - All references to legacy marker removed from hooks, scripts, commands, and tests
 
 ### Changed
 - **BREAKING**: Session storage moved from `planning/sessions/` to `.claude/memory/`

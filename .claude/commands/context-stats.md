@@ -101,7 +101,6 @@ Raw Backups
 ```bash
 cat .claude/memory/.pending-backup-exit 2>/dev/null
 cat .claude/memory/.pending-backup-compact 2>/dev/null
-cat .claude/memory/.pending-backup 2>/dev/null
 ```
 
 Display:
@@ -110,7 +109,6 @@ Pending Backups
 ────────────────────────────────────────────────────────────────────────────────
   .pending-backup-exit:    ✓ Present (raw/20260115_143000_prompt_input_exit.jsonl)
   .pending-backup-compact: ✗ None
-  .pending-backup:         ✗ None (legacy)
 
   Action: Run /resume-latest to process pending backup
 ```

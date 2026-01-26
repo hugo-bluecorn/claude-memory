@@ -85,7 +85,7 @@ After deletion, check if any pending backup markers point to deleted files:
 
 ```bash
 # Check each marker
-for marker in .pending-backup-compact .pending-backup-exit .pending-backup; do
+for marker in .pending-backup-compact .pending-backup-exit; do
   if [[ -f ".claude/memory/$marker" ]]; then
     backup_path=$(cat ".claude/memory/$marker")
     if [[ ! -f "$backup_path" ]]; then

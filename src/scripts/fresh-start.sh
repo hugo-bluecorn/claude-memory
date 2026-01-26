@@ -63,7 +63,7 @@ remove_raw_backups() {
 }
 
 remove_pending_markers() {
-  local markers=(".pending-backup-exit" ".pending-backup-compact" ".pending-backup")
+  local markers=(".pending-backup-exit" ".pending-backup-compact")
 
   for marker in "${markers[@]}"; do
     local marker_path="$SESSIONS_DIR/$marker"

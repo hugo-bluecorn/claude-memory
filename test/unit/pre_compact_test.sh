@@ -242,7 +242,7 @@ function test_pre_compact_backup_preserves_content() {
 # These tests enforce the new marker naming convention to prevent overwrites
 
 function test_pre_compact_creates_compact_marker() {
-  # PreCompact should use .pending-backup-compact (not .pending-backup)
+  # PreCompact should use .pending-backup-compact
   # This prevents overwrites when SessionEnd also runs
   local transcript_file="$TEST_DIR/transcript.jsonl"
   create_test_transcript "$transcript_file"
@@ -250,11 +250,8 @@ function test_pre_compact_creates_compact_marker() {
   local json="{\"transcript_path\":\"$transcript_file\",\"trigger\":\"auto\",\"session_id\":\"test-123\"}"
   echo "$json" | bash "$HOOK_PATH" 2>&1
 
-  # New marker should exist
+  # Compact marker should exist
   assert_file_exists "$HOOK_SESSIONS_DIR/.pending-backup-compact"
-
-  # Old marker should NOT exist (breaking change)
-  assert_file_not_exists "$HOOK_SESSIONS_DIR/.pending-backup"
 
   # Marker should contain backup path
   local marker_content

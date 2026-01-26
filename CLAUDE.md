@@ -74,7 +74,7 @@ Commands in `src/commands/` are markdown prompts Claude follows:
 
 **Manual Save (preferred):** When `/document-and-save` runs, update `active-context.md` FIRST, then write full session document. This order prevents data loss from auto-compaction race conditions.
 
-**Backup Processing:** When processing pending backups via `/resume-latest`, read JSONL, generate summary, update `active-context.md`, delete `.pending-backup` marker.
+**Backup Processing:** When processing pending backups via `/resume-latest`, read JSONL, generate summary, update `active-context.md`, delete pending backup marker.
 
 ## Testing
 
