@@ -146,7 +146,7 @@ cd claude-memory
 
 | Command | Description |
 |---------|-------------|
-| `/document-and-save` | Save current session to `.claude/memory/sessions/session-YYYY-MM-DD-HHMM.md` |
+| `/document-and-save` | Save current session to `.claude/memory/sessions/session-YYYY-MM-DD-HHMMZ.md` (UTC) |
 | `/document-and-save-to <path>` | Save session to a custom path |
 | `/resume-latest` | Process pending backup or load most recent session |
 | `/resume-from <path>` | Load a specific session document |

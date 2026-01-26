@@ -43,7 +43,7 @@ Claude Memory solves a fundamental problem: Claude Code sessions are ephemeral. 
 │  │  └─────────────────────┘  └─────────────────────┘    │                   │
 │  │                                                       │                   │
 │  │  ┌─────────────────────────────────────────────┐     │                   │
-│  │  │  session-YYYY-MM-DD-HHMM.md                 │     │   SESSION        │
+│  │  │  session-YYYY-MM-DD-HHMMZ.md (UTC)          │     │   SESSION        │
 │  │  │  (detailed session documents)               │     │   DOCUMENTS      │
 │  │  └─────────────────────────────────────────────┘     │                   │
 │  │                                                       │                   │
@@ -191,7 +191,7 @@ Claude Memory solves a fundamental problem: Claude Code sessions are ephemeral. 
     ┌──────────────────┐              ┌──────────────────┐
     │ Copy transcript  │              │ Copy transcript  │
     │ to raw/          │              │ to raw/          │
-    │ YYYYMMDD_HHMMSS_ │              │ YYYYMMDD_HHMMSS_ │
+    │ YYYYMMDD_HHMMSSZ_│              │ YYYYMMDD_HHMMSSZ_│
     │ compact.jsonl    │              │ <reason>.jsonl   │
     └────────┬─────────┘              └────────┬─────────┘
              │                                 │
@@ -333,7 +333,7 @@ project/
 
 **Output Example**:
 ```
-SESSION_BACKUP_PENDING (exit): Backup exists at raw/20260115_143000_prompt_input_exit.jsonl
+SESSION_BACKUP_PENDING (exit): Backup exists at raw/20260115_143000Z_prompt_input_exit.jsonl
 User should run /resume-latest to restore context, or /discard-backup to discard.
 CONTEXT_STALE: active-context.md is stale (last updated 48h ago). Consider running /document-and-save to update.
 ```
@@ -343,7 +343,7 @@ CONTEXT_STALE: active-context.md is stale (last updated 48h ago). Consider runni
 **Triggers**: Before Claude Code auto-compacts context
 
 **Actions**:
-1. Copy current transcript to `raw/YYYYMMDD_HHMMSS_compact.jsonl`
+1. Copy current transcript to `raw/YYYYMMDD_HHMMSSZ_compact.jsonl` (UTC)
 2. Create `.pending-backup-compact` marker
 3. Update backup log
 4. Update active-context.md with compaction info
@@ -353,7 +353,7 @@ CONTEXT_STALE: active-context.md is stale (last updated 48h ago). Consider runni
 **Triggers**: When session ends (exit, logout, clear)
 
 **Actions**:
-1. Copy current transcript to `raw/YYYYMMDD_HHMMSS_<reason>.jsonl`
+1. Copy current transcript to `raw/YYYYMMDD_HHMMSSZ_<reason>.jsonl` (UTC)
 2. Create `.pending-backup-exit` marker
 3. Update backup log
 4. Update active-context.md with exit info
@@ -405,14 +405,14 @@ If you run `/document-and-save` and then continue working before compaction occu
 
 ```
 1. /document-and-save at T=0
-   └─► Creates session-2026-01-15-1800.md
+   └─► Creates session-2026-01-15-1800Z.md
    └─► Records "Last Session Doc" in active-context.md
 
 2. Continue working...
    └─► More changes, decisions, progress
 
 3. PreCompact triggers at T=5 (context full)
-   └─► Backs up transcript to raw/YYYYMMDD_compact.jsonl
+   └─► Backs up transcript to raw/YYYYMMDD_HHMMSSZ_compact.jsonl
    └─► Context is compacted
 
 4. After compaction, /resume-latest detects:
@@ -421,7 +421,7 @@ If you run `/document-and-save` and then continue working before compaction occu
    └─► Offers: /coalesce OR process as new session
 
 5. Run /coalesce
-   └─► Merges delta work into session-2026-01-15-1800.md
+   └─► Merges delta work into session-2026-01-15-1800Z.md
    └─► Adds "Session Continuation" section
    └─► Cleans up backup marker
 ```

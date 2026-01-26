@@ -45,7 +45,7 @@ preserves context across sessions using hooks, and provides commands for manual 
         ├── sessions/                # Archived session documents
         │   └── session-*.md
         └── raw/                     # Raw transcript backups
-            └── YYYYMMDD_HHMMSS_*.jsonl
+            └── YYYYMMDD_HHMMSSZ_*.jsonl (UTC)
 ```
 
 ### Auto-Loaded Files
@@ -94,7 +94,7 @@ All hooks are bash scripts in `.claude/hooks/`. They are triggered automatically
 **Behavior**:
 - Reads JSON input: `{"session_id", "transcript_path", "stop_reason"}`
 - If transcript exists and is non-empty:
-  - Copies to `raw/YYYYMMDD_HHMMSS_<reason>.jsonl`
+  - Copies to `raw/YYYYMMDD_HHMMSSZ_<reason>.jsonl` (UTC)
   - Creates `.pending-backup-exit` marker with backup path
   - Updates `active-context.md` with exit timestamp
   - Logs event to `.backup-log`
@@ -106,7 +106,7 @@ All hooks are bash scripts in `.claude/hooks/`. They are triggered automatically
 **Behavior**:
 - Reads JSON input: `{"transcript_path", "trigger", "session_id"}`
 - If transcript exists and is non-empty:
-  - Copies to `raw/YYYYMMDD_HHMMSS_compact.jsonl`
+  - Copies to `raw/YYYYMMDD_HHMMSSZ_compact.jsonl` (UTC)
   - Creates `.pending-backup-compact` marker
   - Logs event to `.backup-log`
 
@@ -118,7 +118,7 @@ All commands are markdown files in `.claude/commands/`. They define prompts that
 
 ### /document-and-save
 
-Save session to default path: `.claude/memory/sessions/session-YYYY-MM-DD-HHMM.md`
+Save session to default path: `.claude/memory/sessions/session-YYYY-MM-DD-HHMMZ.md` (UTC)
 
 **Steps**:
 1. Check for pending backup (inform user if exists)
