@@ -33,8 +33,16 @@ Continue with documentation (don't block).
 This is the most critical step - do this BEFORE writing the full session document.
 Write condensed context immediately:
 
+**IMPORTANT**: Always update the `> Last Updated:` timestamp to the current UTC time with Z suffix (YYYY-MM-DDTHH:MM:SSZ).
+This enables staleness detection and allows direct comparison with JSONL backup timestamps.
+
+**NOTE**: The `> Last Session Doc:` field will be set in Step 3 after creating the session document.
+This enables session coalescing - merging delta work done after this save but before compaction.
+
 ```markdown
 # Active Session Context
+> Last Updated: YYYY-MM-DDTHH:MM:SSZ
+> Last Session Doc: [will be set after document creation]
 
 ## Current Task
 [From Next Steps - what to work on next]
@@ -51,6 +59,9 @@ Write condensed context immediately:
 ## Blockers
 - [Any blocking issues, or "None"]
 
+## Warnings/Gotchas
+- [Critical things to avoid or remember]
+
 ## Key Files Modified
 - [List of important files changed this session]
 ```
@@ -60,7 +71,7 @@ Write condensed context immediately:
 Start with YAML frontmatter:
 ```yaml
 ---
-date: YYYY-MM-DD HH:MM
+date: YYYY-MM-DDTHH:MMZ
 project: <infer from cwd name or package.json>
 status: completed | in-progress | blocked
 tags: [relevant, keywords]
@@ -89,10 +100,14 @@ Include all sections:
 
 1. Create parent directories if needed
 2. Confirm the file was created with full path
-3. Provide resume instructions:
+3. **Update `active-context.md` with session doc path** for coalescing support:
+   - Edit the `> Last Session Doc:` line to contain the actual document path/filename
+   - This enables `/coalesce` to merge delta work if compaction occurs before the next save
+4. Provide resume instructions:
    - "Next session will auto-load context via CLAUDE.md @imports"
    - For full details: `/resume-from <filepath>`
    - Alternative: `/resume-latest` to automatically load the most recent session
+   - If compaction occurs before next `/document-and-save`, run `/coalesce` to merge delta work
 
 ---
 
@@ -102,3 +117,4 @@ Include all sections:
 - **[/resume-from](resume-from.md)** - Load a specific session document
 - **[/resume-latest](resume-latest.md)** - Load most recent session
 - **[/sessions-list](sessions-list.md)** - Browse all session logs
+- **[/coalesce](coalesce.md)** - Merge delta work after compaction into last session document

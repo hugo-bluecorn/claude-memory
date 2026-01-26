@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- `/document-and-save-to` now includes UTC timestamp instructions (was missing after timestamp standardization)
+  - Added IMPORTANT instruction about UTC Z suffix format for `> Last Updated:`
+  - Added `> Last Updated:` and `> Last Session Doc:` metadata to template
+  - Fixed YAML frontmatter date format from `YYYY-MM-DD HH:MM` to `YYYY-MM-DDTHH:MMZ`
+  - Added Warnings/Gotchas section and coalescing support instructions
+
 ### Added
 - **UTC timestamps with Z suffix** across all files for consistent timezone handling
   - Session filenames: `session-YYYY-MM-DD-HHMMZ.md`
