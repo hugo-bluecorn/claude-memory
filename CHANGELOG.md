@@ -18,7 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Uses jq to filter JSONL by timestamp before loading into context
   - Only loads records created after session document timestamp
   - Significantly reduces token usage for delta extraction
-- Backward compatibility: hooks parse both old and new timestamp formats
 - **Enhanced extraction strategy** with 8 additional context categories:
   - Environment & Configuration, Code Understanding, User Preferences
   - Test Status, Technical Debt, Warnings & Gotchas, References Used
@@ -66,6 +65,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `bash "$CLAUDE_PROJECT_DIR/..."` ensures bash handles variable expansion
 
 ### Removed
+- **BREAKING**: Legacy timestamp format support removed
+  - Old formats (`YYYY-MM-DD HH:MM:SS`, `session-YYYY-MM-DD-HHMM.md`) no longer parsed
+  - All timestamps now require UTC Z suffix
 - **BREAKING**: Legacy `.pending-backup` marker support removed
   - System now exclusively uses `.pending-backup-exit` and `.pending-backup-compact`
   - All references to legacy marker removed from hooks, scripts, commands, and tests

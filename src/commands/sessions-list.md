@@ -25,7 +25,7 @@ If a pending backup exists, display it prominently before the session list:
 
 - Look in `.claude/memory/` directory
 - Find all `.md` files
-- Sort by date (newest first, based on filename pattern `session-YYYY-MM-DD-HHMMZ.md` or legacy `session-YYYY-MM-DD-HHMM.md`)
+- Sort by date (newest first, based on filename pattern `session-YYYY-MM-DD-HHMMZ.md`)
 
 If the directory doesn't exist or is empty:
 - Inform the user: "No session logs found in `.claude/memory/`. Use `/document-and-save` to create your first session log."

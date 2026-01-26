@@ -37,7 +37,6 @@ If no backups exist, inform the user and exit.
 Extract timestamps from filenames. Backup files follow the pattern:
 - `YYYYMMDD_HHMMSSZ_<reason>.jsonl` (from SessionEnd, UTC)
 - `YYYYMMDD_HHMMSSZ_compact.jsonl` (from PreCompact, UTC)
-- Legacy: `YYYYMMDD_HHMMSS_*.jsonl` (without Z suffix)
 
 ### 3. Apply Filters
 

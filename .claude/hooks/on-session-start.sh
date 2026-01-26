@@ -88,18 +88,11 @@ check_staleness() {
   local timestamp
   timestamp=$(echo "$timestamp_line" | sed 's/^> Last Updated: //')
 
-  # Convert timestamp to epoch seconds (handle both old and new formats)
+  # Convert UTC timestamp to epoch seconds (format: YYYY-MM-DDTHH:MM:SSZ)
   local context_epoch
-  if [[ "$timestamp" == *"Z" ]]; then
-    # ISO 8601 UTC format (new): 2026-01-26T03:30:00Z
-    local ts_no_z="${timestamp%Z}"
-    context_epoch=$(date -u -d "$ts_no_z" +%s 2>/dev/null || \
-                    date -j -u -f "%Y-%m-%dT%H:%M:%S" "$ts_no_z" +%s 2>/dev/null || echo "")
-  else
-    # Legacy format: YYYY-MM-DD HH:MM:SS
-    context_epoch=$(date -d "$timestamp" +%s 2>/dev/null || \
-                    date -j -f "%Y-%m-%d %H:%M:%S" "$timestamp" +%s 2>/dev/null || echo "")
-  fi
+  local ts_no_z="${timestamp%Z}"
+  context_epoch=$(date -u -d "$ts_no_z" +%s 2>/dev/null || \
+                  date -j -u -f "%Y-%m-%dT%H:%M:%S" "$ts_no_z" +%s 2>/dev/null || echo "")
 
   if [[ -z "$context_epoch" ]]; then
     # Could not parse timestamp
