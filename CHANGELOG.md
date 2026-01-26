@@ -53,6 +53,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - All references to legacy marker removed from hooks, scripts, commands, and tests
 
 ### Changed
+- `/resume-latest` now prioritizes session documents over raw JSONL backups
+  - When both exist, shows 3 options: load session doc + delta, load session doc only, or process backup
+  - Session documents are the primary resumption source; raw backups are safety net for delta work
 - **BREAKING**: Session storage moved from `planning/sessions/` to `.claude/memory/`
   - Context files: `.claude/memory/active-context.md`, `.claude/memory/project-memory.md`
   - Session documents: `.claude/memory/sessions/session-*.md`
