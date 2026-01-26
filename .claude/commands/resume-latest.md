@@ -33,32 +33,54 @@ Please follow these steps. Wrap all output at 120 characters maximum.
 
 **If pending backup(s) exist:**
 
-### Check for Coalesce Opportunity (Compact Backup Only)
+### Check for Linked Session Document
 
-If `.pending-backup-compact` exists (but NOT `.pending-backup-exit`), check if coalescing is possible:
+For ANY pending backup (exit OR compact), check if a session document exists:
 
 1. Look for `> Last Session Doc:` field in `.claude/memory/active-context.md`
-2. If found and the session document exists, **offer coalescing first**:
+2. Verify the session document file exists in `.claude/memory/sessions/`
+3. If found, **always offer session-first options**:
 
 ```
-Detected pending compact backup: [backup-path]
-Last session document: [session-doc-name]
+Detected pending backup: [backup-path]
+Type: [exit/compact]
+Linked session document: [session-doc-name]
 
-This backup contains delta work done after /document-and-save but before compaction.
+The session document was saved before the session ended.
+The backup may contain additional work done after /document-and-save.
 
 Options:
-1. /coalesce - Merge delta into existing session document (recommended if continuing same work)
-2. Continue with /resume-latest - Process backup as a new session
-3. /discard-backup - Discard the backup without processing
+1. [RECOMMENDED] Load session document + check for delta work
+2. Load session document only (discard backup)
+3. Process backup as new session (ignore session document)
 
-Which option? (or proceed with option 2 if --yes flag)
+Choose option (1-3):
 ```
 
-If `--yes` flag is present, proceed with option 2 (process as new session).
+**Option 1 Flow:**
+1. Load session document using `/resume-from` flow
+2. Perform lightweight delta check on JSONL:
+   - Count file edits (Write/Edit tool uses)
+   - Count substantive user messages (excluding commands)
+   - Check time delta between session doc and backup
+3. If delta is substantial (file edits > 0 OR time delta > 30min):
+   - Present: "Since your last save, you also: [brief delta summary]"
+   - Ask: "Add this to your context? [Y/n]"
+4. Clean up backup marker (and optionally backup file)
+
+**Option 2 Flow:**
+1. Load session document using `/resume-from` flow
+2. Delete backup marker and backup file
+3. Inform user: "Backup discarded. Proceeding with session document."
+
+**Option 3 Flow:**
+Continue to "Standard Backup Processing" below.
+
+If no linked session document exists, skip directly to "Standard Backup Processing".
 
 ### Standard Backup Processing
 
-If coalescing is not offered or user chooses option 2:
+If no linked session document exists, OR user chose option 3:
 - Read the raw transcript file(s) indicated in the marker(s)
 - Parse the JSONL conversation history (see JSONL Format Reference below)
 - Generate a high-quality summary following the Extraction Strategy
