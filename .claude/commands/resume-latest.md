@@ -190,21 +190,40 @@ Each line in the raw transcript is a JSON object with one of these structures:
 
 ## Extraction Strategy
 
-When parsing a raw transcript, follow this strategy to build a useful summary:
+When parsing a raw transcript, extract these categories:
 
-1. **Identify main tasks/questions**: Collect all user messages and extract the primary requests
-2. **Extract decisions and explanations**: Review assistant messages for key decisions, reasoning, and explanations given
-3. **Track files modified**: Look for `tool_use` of type "Write" or "Edit" to identify changed files
-4. **Document failed approaches**: Search `tool_result` outputs for error patterns, exceptions, or failed attempts
-5. **Note environment details**: Extract any system info, configuration, or environment-specific details mentioned
+### Core Categories (always extract)
 
-**Summary structure**: Organize extracted information into these sections:
-- **Session Goal**: What the user wanted to accomplish
-- **Key Accomplishments**: What was completed successfully
-- **Files Changed**: List of files created, modified, or deleted
-- **Decisions Made**: Important choices and their rationale
-- **Failed Approaches**: What didn't work and why (helps avoid repeating mistakes)
-- **Next Steps**: What was planned but not completed
+1. **Session Goal**: Collect user messages, identify primary requests
+2. **Key Accomplishments**: Review assistant messages for completed work
+3. **Files Changed**: Look for `tool_use` of type "Write" or "Edit"
+4. **Decisions Made**: Extract choices and their rationale
+5. **Failed Approaches**: Search `tool_result` for errors, exceptions, failed attempts
+6. **Next Steps**: Identify planned but incomplete work
+
+### Enhanced Categories (extract when present)
+
+7. **Environment & Configuration**: System info, dependency versions, configs mentioned
+8. **Code Understanding**: Architectural insights, patterns learned, "aha moments"
+9. **User Preferences**: Stated preferences, style choices, workflow decisions
+10. **Blockers & Parking Lot**: Unresolved issues, deferred items, external dependencies
+11. **Test Status**: Test runs, pass/fail counts, coverage info
+12. **Technical Debt**: Shortcuts taken, TODOs noted, refactoring needs
+13. **Warnings & Gotchas**: Pitfalls discovered, "don't do this" lessons
+14. **References Used**: Docs consulted, links shared, external resources
+
+### Extraction Signals
+
+| Category | Look for in JSONL |
+|----------|-------------------|
+| Files Changed | `tool_use` with `tool="Write"` or `tool="Edit"` |
+| Failed Approaches | `tool_result` with error messages, exceptions, "failed" |
+| Test Status | `tool_use` with test commands (pytest, jest, npm test) |
+| Technical Debt | Assistant messages containing "TODO", "hack", "temporary" |
+| Warnings/Gotchas | Assistant messages with "warning", "gotcha", "don't", "avoid" |
+| References | URLs in messages, "documentation", "according to" |
+
+**Summary structure**: Organize into sections matching the session document template in `/document-and-save`
 
 ---
 

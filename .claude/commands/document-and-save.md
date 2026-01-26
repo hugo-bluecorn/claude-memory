@@ -57,6 +57,9 @@ This enables session coalescing - merging delta work done after this save but be
 ## Blockers
 - [Any blocking issues, or "None"]
 
+## Warnings/Gotchas
+- [Critical things to avoid or remember]
+
 ## Key Files Modified
 - [List of important files changed this session]
 ```
@@ -103,9 +106,9 @@ This creates a chain of sessions that can be followed for full project history.
    - Coding patterns or conventions established
    - Trade-offs considered and chosen approaches
 
-   ## Clarifications & Decisions
+   ## User Preferences & Decisions
+   - User preferences captured (style choices, workflow decisions)
    - Key questions asked and answers given during the session
-   - User preferences captured
    - Decisions made based on user input
 
    ## Failed Approaches
@@ -145,16 +148,32 @@ This creates a chain of sessions that can be followed for full project history.
    - Any config details that are important
    - System-specific notes if applicable
 
-   ## Code Context
-   - Critical code snippets or patterns that are important for continuation
-   - Key function signatures or interfaces being implemented
-   - Any code that needs to be remembered for context
+   ## Test Status
+   - Tests run: [pass/fail counts, or "not run"]
+   - Coverage: [if known]
+   - Failing tests: [list any failures with brief descriptions]
 
-   ## Context & Notes
-   - Important context that shouldn't be lost
-   - Lessons learned during this session
-   - Gotchas or warnings for future self
-   - Any other relevant information
+   ## Technical Debt
+   - Known shortcuts or temporary solutions taken
+   - Items needing future refactoring
+   - TODOs noted during the session
+
+   ## Code Understanding
+   - Architectural insights gained during this session
+   - Key patterns learned about the codebase
+   - "Aha moments" and paradigm shifts
+   - Critical code snippets or patterns for continuation
+
+   ## Warnings & Gotchas
+   - Pitfalls discovered during this session
+   - Things that don't work as expected
+   - Critical "don't do this" notes for future sessions
+   - Lessons learned the hard way
+
+   ## References Used
+   - Documentation consulted (with links if available)
+   - Stack Overflow, GitHub issues, or other resources referenced
+   - External tools or services used
 
 ## Step 3: Final Steps
 

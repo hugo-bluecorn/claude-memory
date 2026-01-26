@@ -75,16 +75,31 @@ Briefly summarize:
 - Note what was tried and didn't work
 - **DO NOT retry these approaches** unless the user explicitly requests it or circumstances have changed
 
-### Clarifications & Decisions
+### User Preferences & Decisions
 - Restore user preferences and decisions made during the session
 - Apply these preferences to subsequent work
 
 ### Environment Notes
 - Note any dependency versions, config details, or system-specific information
 
-### Code Context
-- Review critical code snippets or patterns
-- Use these for reference when continuing implementation
+### Test Status
+- Note any failing tests or coverage gaps
+- Prioritize fixing test failures before adding new features
+
+### Technical Debt
+- Be aware of shortcuts taken that need future attention
+- Don't add more debt on top of existing debt without user acknowledgment
+
+### Code Understanding
+- Review architectural insights and patterns learned
+- Apply these learnings to subsequent work
+
+### Warnings & Gotchas
+- **CRITICAL**: Review pitfalls and "don't do this" notes
+- Avoid repeating mistakes documented here
+
+### References Used
+- Note helpful documentation or resources for reference
 
 ## 5. Verify Current State
 

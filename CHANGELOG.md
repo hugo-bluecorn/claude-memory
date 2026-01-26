@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Enhanced extraction strategy** with 8 additional context categories:
+  - Environment & Configuration, Code Understanding, User Preferences
+  - Test Status, Technical Debt, Warnings & Gotchas, References Used
+  - Extraction signals documented for each category
+- New session document sections: Test Status, Technical Debt, Code Understanding, Warnings & Gotchas, References Used
+- "Warnings/Gotchas" field added to active-context.md template
+- Renamed "Clarifications & Decisions" to "User Preferences & Decisions" for clarity
 - **Remote install**: `setup_memory_management.sh` now fetches files from GitHub
   - Uses curl or wget (auto-detected)
   - Downloads 12 commands, 3 hooks, 2 scripts, and 2 templates
