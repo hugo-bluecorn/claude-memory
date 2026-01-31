@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `/coalesce` now uses `update-active-context-timestamp.sh` for updating active-context.md
 
 ### Fixed
+- **Delta extraction timestamp comparison**: `/resume-latest` Option 1 was failing to extract delta records
+  - Root cause: Session doc YAML date `YYYY-MM-DDTHH:MMZ` (no seconds) vs JSONL `YYYY-MM-DDTHH:MM:SS.sssZ` (with seconds)
+  - String comparison fails because `Z` (ASCII 90) > `:` (ASCII 58)
+  - Solution: Keep full timestamp with seconds in YAML date field (`YYYY-MM-DDTHH:MM:SSZ`)
 - **Timestamp fabrication bug**: Claude was writing rounded/fabricated timestamps instead of actual UTC time
   - Root cause: LLMs experience "cognitive drift" and can't reliably use stdout values
   - Solution: Scripts handle timestamp writing, Claude never writes timestamps directly
@@ -34,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **UTC timestamps with Z suffix** across all files for consistent timezone handling
   - Session filenames: `session-YYYY-MM-DD-HHMMZ.md`
-  - YAML frontmatter: `date: YYYY-MM-DDTHH:MMZ`
+  - YAML frontmatter: `date: YYYY-MM-DDTHH:MM:SSZ` (with seconds for delta comparison)
   - active-context.md: `> Last Updated: YYYY-MM-DDTHH:MM:SSZ`
   - Backup filenames: `YYYYMMDD_HHMMSSZ_*.jsonl`
   - Direct comparison with JSONL record timestamps (already UTC)

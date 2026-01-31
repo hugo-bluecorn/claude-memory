@@ -85,8 +85,8 @@ bash .claude/scripts/get-utc-timestamp.sh
 ```
 
 Use this timestamp for:
-- Session filename: `session-YYYY-MM-DD-HHMMZ.md` (remove seconds, keep Z suffix)
-- YAML `date:` field: `YYYY-MM-DDTHH:MMZ` (same format, in frontmatter)
+- Session filename: `session-YYYY-MM-DD-HHMMZ.md` (remove seconds for readability)
+- YAML `date:` field: Use the FULL timestamp with seconds (e.g., `2026-01-31T09:14:23Z`) for accurate delta comparison
 
 ### Step 2b: Create Session Document
 
@@ -107,7 +107,7 @@ This creates a chain of sessions that can be followed for full project history.
 
    ```yaml
    ---
-   date: YYYY-MM-DDTHH:MMZ
+   date: YYYY-MM-DDTHH:MM:SSZ
    project: <infer from cwd name or package.json>
    status: completed | in-progress | blocked
    tags: [relevant, keywords, for, this, session]
