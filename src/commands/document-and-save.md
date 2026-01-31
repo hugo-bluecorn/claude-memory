@@ -29,17 +29,27 @@ Continue with documentation (don't block).
 ## Step 1: UPDATE `.claude/memory/active-context.md` FIRST
 
 This is the most critical step - do this BEFORE writing the full session document.
-Write condensed context immediately:
 
-**IMPORTANT**: Always update the `> Last Updated:` timestamp to the current UTC time with Z suffix (YYYY-MM-DDTHH:MM:SSZ).
-This enables staleness detection and allows direct comparison with JSONL backup timestamps.
+### Step 1a: Update Timestamp via Script
 
-**NOTE**: The `> Last Session Doc:` field will be set in Step 2 after creating the session document.
+**CRITICAL**: Run the timestamp script to set the `> Last Updated:` field. Do NOT write timestamps manually.
+
+```bash
+bash .claude/scripts/update-active-context-timestamp.sh
+```
+
+This script updates the timestamp automatically, preventing timestamp fabrication issues.
+
+### Step 1b: Update Content
+
+After running the timestamp script, update the rest of active-context.md with current session state.
+
+**NOTE**: The `> Last Session Doc:` field will be set in Step 3 after creating the session document.
 This enables session coalescing - merging delta work done after this save but before compaction.
 
 ```markdown
 # Active Session Context
-> Last Updated: YYYY-MM-DDTHH:MM:SSZ
+> Last Updated: [ALREADY SET BY SCRIPT - DO NOT MODIFY]
 > Last Session Doc: session-YYYY-MM-DD-HHMMZ.md
 
 ## Current Task
@@ -66,7 +76,21 @@ This enables session coalescing - merging delta work done after this save but be
 
 ## Step 2: Create Full Session Document
 
-Create a comprehensive session document in `.claude/memory/sessions/session-YYYY-MM-DD-HHMMZ.md` (UTC time with Z suffix):
+### Step 2a: Get Timestamp for Filename
+
+**CRITICAL**: Get the current UTC timestamp from the script for the filename and YAML date:
+
+```bash
+bash .claude/scripts/get-utc-timestamp.sh
+```
+
+Use this timestamp for:
+- Session filename: `session-YYYY-MM-DD-HHMMZ.md` (remove seconds, keep Z suffix)
+- YAML `date:` field: `YYYY-MM-DDTHH:MMZ` (same format, in frontmatter)
+
+### Step 2b: Create Session Document
+
+Create the document in `.claude/memory/sessions/session-YYYY-MM-DD-HHMMZ.md`:
 
 ### Auto-detect Previous Session
 

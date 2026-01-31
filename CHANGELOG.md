@@ -7,7 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Timestamp helper scripts** to prevent Claude from fabricating timestamps
+  - `get-utc-timestamp.sh` - outputs current UTC time in ISO 8601 format
+  - `update-active-context-timestamp.sh` - updates `> Last Updated:` field in active-context.md
+  - Scripts handle timestamps internally, removing Claude from timestamp writing
+- Unit tests for timestamp scripts (14 new tests)
+
+### Changed
+- `/document-and-save` now uses timestamp scripts instead of relying on Claude to write timestamps
+  - Step 1 runs `update-active-context-timestamp.sh` first
+  - Step 2 runs `get-utc-timestamp.sh` for session document filename and YAML date
+- `/document-and-save-to` updated to use timestamp scripts (same pattern as `/document-and-save`)
+- `/coalesce` now uses `update-active-context-timestamp.sh` for updating active-context.md
+
 ### Fixed
+- **Timestamp fabrication bug**: Claude was writing rounded/fabricated timestamps instead of actual UTC time
+  - Root cause: LLMs experience "cognitive drift" and can't reliably use stdout values
+  - Solution: Scripts handle timestamp writing, Claude never writes timestamps directly
 - `/document-and-save-to` now includes UTC timestamp instructions (was missing after timestamp standardization)
   - Added IMPORTANT instruction about UTC Z suffix format for `> Last Updated:`
   - Added `> Last Updated:` and `> Last Session Doc:` metadata to template

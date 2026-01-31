@@ -135,7 +135,12 @@ Update the YAML frontmatter:
 ### Step 6: Update active-context.md
 
 Update `.claude/memory/active-context.md`:
-1. Update `> Last Updated:` to current UTC timestamp (YYYY-MM-DDTHH:MM:SSZ)
+
+1. **Update timestamp via script** (CRITICAL - do NOT write timestamps manually):
+   ```bash
+   bash .claude/scripts/update-active-context-timestamp.sh
+   ```
+
 2. Keep `> Last Session Doc:` pointing to same file (now updated)
 3. Update other sections to reflect the coalesced work
 4. Remove or update the `## Compaction` section
