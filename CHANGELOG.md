@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+No unreleased changes.
+
+## [0.2.0] - 2026-01-31
+
 ### Added
 - **Timestamp helper scripts** to prevent Claude from fabricating timestamps
   - `get-utc-timestamp.sh` - outputs current UTC time in ISO 8601 format

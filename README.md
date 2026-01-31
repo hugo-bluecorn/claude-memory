@@ -1,5 +1,7 @@
 # Claude Memory
 
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
+
 A session continuity system for Claude Code that automatically preserves context across sessions.
 
 ## System Overview
@@ -226,7 +228,9 @@ your-project/
     │   └── on-session-start.sh
     ├── scripts/
     │   ├── discard-backup.sh
-    │   └── fresh-start.sh
+    │   ├── fresh-start.sh
+    │   ├── get-utc-timestamp.sh
+    │   └── update-active-context-timestamp.sh
     ├── memory/
     │   ├── active-context.md        # Current session state (auto-loaded)
     │   ├── project-memory.md        # Permanent knowledge (auto-loaded)
