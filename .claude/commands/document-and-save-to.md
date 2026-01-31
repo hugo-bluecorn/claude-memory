@@ -86,14 +86,14 @@ This enables session coalescing - merging delta work done after this save but be
 bash .claude/scripts/get-utc-timestamp.sh
 ```
 
-Use this timestamp for the YAML `date:` field (format: `YYYY-MM-DDTHH:MMZ`, remove seconds).
+Use the FULL timestamp with seconds for the YAML `date:` field (e.g., `2026-01-31T09:14:23Z`) for accurate delta comparison.
 
 ### Step 2b: Write Session Document
 
 Start with YAML frontmatter:
 ```yaml
 ---
-date: [USE TIMESTAMP FROM SCRIPT - REMOVE SECONDS]
+date: [USE FULL TIMESTAMP FROM SCRIPT WITH SECONDS]
 project: <infer from cwd name or package.json>
 status: completed | in-progress | blocked
 tags: [relevant, keywords]
