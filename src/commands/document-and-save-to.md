@@ -31,17 +31,27 @@ Continue with documentation (don't block).
 ## Step 1: UPDATE `.claude/memory/active-context.md` FIRST
 
 This is the most critical step - do this BEFORE writing the full session document.
-Write condensed context immediately:
 
-**IMPORTANT**: Always update the `> Last Updated:` timestamp to the current UTC time with Z suffix (YYYY-MM-DDTHH:MM:SSZ).
-This enables staleness detection and allows direct comparison with JSONL backup timestamps.
+### Step 1a: Update Timestamp via Script
+
+**CRITICAL**: Run the timestamp script to set the `> Last Updated:` field. Do NOT write timestamps manually.
+
+```bash
+bash .claude/scripts/update-active-context-timestamp.sh
+```
+
+This script updates the timestamp automatically, preventing timestamp fabrication issues.
+
+### Step 1b: Update Content
+
+After running the timestamp script, update the rest of active-context.md with current session state.
 
 **NOTE**: The `> Last Session Doc:` field will be set in Step 3 after creating the session document.
 This enables session coalescing - merging delta work done after this save but before compaction.
 
 ```markdown
 # Active Session Context
-> Last Updated: YYYY-MM-DDTHH:MM:SSZ
+> Last Updated: [ALREADY SET BY SCRIPT - DO NOT MODIFY]
 > Last Session Doc: [will be set after document creation]
 
 ## Current Task
@@ -68,10 +78,22 @@ This enables session coalescing - merging delta work done after this save but be
 
 ## Step 2: Create Full Session Document
 
+### Step 2a: Get Timestamp for YAML
+
+**CRITICAL**: Get the current UTC timestamp from the script for the YAML date field:
+
+```bash
+bash .claude/scripts/get-utc-timestamp.sh
+```
+
+Use this timestamp for the YAML `date:` field (format: `YYYY-MM-DDTHH:MMZ`, remove seconds).
+
+### Step 2b: Write Session Document
+
 Start with YAML frontmatter:
 ```yaml
 ---
-date: YYYY-MM-DDTHH:MMZ
+date: [USE TIMESTAMP FROM SCRIPT - REMOVE SECONDS]
 project: <infer from cwd name or package.json>
 status: completed | in-progress | blocked
 tags: [relevant, keywords]
